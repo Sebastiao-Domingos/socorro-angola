@@ -1,0 +1,559 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#2E7D52">
+<meta name="description" content="Torne-se voluntário do SocorroAO e ajude a salvar vidas em Angola">
+<title>💚 Tornar-me Voluntário — SocorroAO</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --green:#2E7D52;--green2:#3DAA6F;
+  --red:#C8401A;--dark:#0D0B09;
+  --gold:#D4A843;--blue:#1A5C8A;
+  --bg:#F0F7F3;--surface:#FFFFFF;--border:#D4E8DC;
+  --text:#1A1714;--text2:#5C544A;--text3:#9A8F82;
+  --radius:14px;--shadow:0 4px 24px rgba(26,23,20,0.09);
+}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
+h1,h2,h3,h4{font-family:'Syne',sans-serif;}
+
+/* ── TOP BAR ── */
+.pub-topbar{background:var(--dark);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.pub-logo{display:flex;align-items:center;gap:9px;text-decoration:none;}
+.pub-logo-icon{width:34px;height:34px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;}
+.pub-logo-text{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:#fff;}
+.pub-logo-text span{color:var(--green2);}
+.pub-topbar-links{display:flex;gap:10px;}
+.pub-topbar-link{font-size:13px;color:rgba(255,255,255,0.55);text-decoration:none;padding:6px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:7px;transition:all 0.2s;}
+.pub-topbar-link:hover{color:#fff;border-color:rgba(255,255,255,0.25);}
+.pub-topbar-link.cta{background:rgba(46,125,82,0.35);border-color:rgba(46,125,82,0.6);color:#fff;}
+
+/* ── HERO ── */
+.vol-hero{
+  background:linear-gradient(135deg, #1A5A35 0%, var(--green) 60%, #3DAA6F 100%);
+  padding:40px 20px 36px;text-align:center;position:relative;overflow:hidden;
+}
+.vol-hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,0.05) 1px,transparent 1px);background-size:22px 22px;}
+.vol-hero-pill{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);
+  border-radius:100px;padding:5px 14px;font-size:11.5px;font-weight:700;
+  color:#fff;letter-spacing:0.8px;text-transform:uppercase;
+  margin-bottom:18px;font-family:'Syne',sans-serif;
+}
+.vol-hero h1{font-size:clamp(26px,6vw,40px);font-weight:800;color:#fff;line-height:1.08;margin-bottom:12px;position:relative;}
+.vol-hero p{font-size:15.5px;color:rgba(255,255,255,0.82);max-width:500px;margin:0 auto 24px;line-height:1.65;position:relative;}
+.vol-hero-stats{
+  display:inline-flex;gap:0;
+  background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);
+  border-radius:12px;overflow:hidden;position:relative;
+}
+.vol-hero-stat{padding:12px 20px;text-align:center;border-right:1px solid rgba(255,255,255,0.15);}
+.vol-hero-stat:last-child{border-right:none;}
+.vol-hero-stat-num{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;}
+.vol-hero-stat-label{font-size:10px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.8px;}
+
+/* ── WHY SECTION ── */
+.why-section{padding:28px 20px;max-width:620px;margin:0 auto;}
+.section-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--green);margin-bottom:14px;font-family:'Syne',sans-serif;display:flex;align-items:center;gap:8px;}
+.section-label::before{content:'';width:24px;height:2px;background:var(--green);border-radius:1px;}
+.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0;}
+.why-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 14px;display:flex;align-items:flex-start;gap:10px;}
+.why-emoji{font-size:26px;flex-shrink:0;}
+.why-title{font-family:'Syne',sans-serif;font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.why-desc{font-size:12.5px;color:var(--text3);line-height:1.45;}
+
+/* ── FORM ── */
+.pub-form-wrap{max-width:620px;margin:0 auto;padding:0 16px 48px;}
+.form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow);}
+.form-card-head{padding:16px 20px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,#F5FAF6,#EDF5EF);display:flex;align-items:center;gap:10px;}
+.form-card-icon{font-size:22px;}
+.form-card-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);}
+.form-card-subtitle{font-size:12.5px;color:var(--text3);margin-top:2px;}
+.form-card-body{padding:18px 20px;}
+label.fl{display:block;font-size:12.5px;font-weight:700;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;}
+label.fl .req{color:var(--red);}
+.fi{width:100%;background:var(--bg);color:var(--text);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:15px;transition:border 0.2s,box-shadow 0.2s;outline:none;-webkit-appearance:none;appearance:none;}
+.fi:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(46,125,82,0.12);}
+.fi::placeholder{color:var(--text3);}
+textarea.fi{resize:vertical;min-height:80px;}
+select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239A8F82' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;}
+.fg{margin-bottom:14px;}.fg:last-child{margin-bottom:0;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* ── Habilidades ── */
+.hab-group-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);margin:14px 0 8px;font-family:'Syne',sans-serif;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.hab-grid{display:flex;flex-wrap:wrap;gap:7px;}
+.hab-chip{position:relative;}
+.hab-chip input{position:absolute;opacity:0;width:0;height:0;}
+.hab-chip label{
+  display:flex;align-items:center;gap:5px;
+  padding:7px 12px;border:1.5px solid var(--border);border-radius:100px;
+  cursor:pointer;transition:all 0.18s;background:var(--bg);
+  font-size:13px;color:var(--text2);white-space:nowrap;
+}
+.hab-chip label:hover{border-color:var(--green);color:var(--text);}
+.hab-chip input:checked + label{border-color:var(--green);background:rgba(46,125,82,0.08);color:var(--green);font-weight:600;}
+.hab-emoji{font-size:15px;}
+.hab-selected-count{font-size:12px;color:var(--green);font-weight:600;margin-top:10px;display:none;}
+
+/* ── Photo ── */
+.photo-zone{border:2px dashed var(--border);border-radius:12px;padding:24px 16px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--bg);position:relative;}
+.photo-zone:hover{border-color:var(--green);background:rgba(46,125,82,0.04);}
+.photo-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.photo-zone-icon{font-size:36px;margin-bottom:10px;}
+.photo-zone-text{font-size:14px;font-weight:600;color:var(--text2);margin-bottom:4px;}
+.photo-zone-sub{font-size:12px;color:var(--text3);}
+.photo-preview{display:none;margin-top:12px;}
+.photo-preview img{width:88px;height:88px;object-fit:cover;border-radius:50%;border:3px solid var(--green);}
+
+/* ── GPS ── */
+.gps-row{display:flex;gap:8px;align-items:flex-end;}
+.gps-btn{flex-shrink:0;background:var(--dark);color:#fff;border:none;border-radius:10px;padding:12px 14px;font-size:16px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:5px;}
+.gps-btn span{font-size:12.5px;font-weight:600;font-family:'Syne',sans-serif;}
+.gps-status{font-size:11.5px;margin-top:5px;height:16px;}
+.gps-ok{color:var(--green);}.gps-err{color:var(--red);}
+
+/* ── Termos ── */
+.terms-box{background:#F5FAF6;border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:14px;}
+.terms-check{display:flex;align-items:flex-start;gap:10px;cursor:pointer;}
+.terms-check input{margin-top:3px;accent-color:var(--green);width:18px;height:18px;flex-shrink:0;}
+.terms-text{font-size:13.5px;color:var(--text2);line-height:1.55;}
+
+/* ── Submit ── */
+.pub-submit{width:100%;background:var(--green);color:#fff;border:none;border-radius:12px;padding:18px;font-family:'Syne',sans-serif;font-size:17px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all 0.2s;box-shadow:0 4px 20px rgba(46,125,82,0.35);}
+.pub-submit:hover{background:var(--green2);transform:translateY(-2px);box-shadow:0 8px 28px rgba(46,125,82,0.45);}
+.pub-submit:active{transform:scale(0.98);}
+.pub-submit:disabled{opacity:0.6;pointer-events:none;}
+.spinner{width:20px;height:20px;border:3px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:none;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Responsive */
+@media(max-width:480px){
+  .why-grid{grid-template-columns:1fr;}
+  .grid2{grid-template-columns:1fr;}
+  .vol-hero-stats{flex-direction:column;}
+  .vol-hero-stat{border-right:none;border-bottom:1px solid rgba(255,255,255,0.15);}
+  .vol-hero-stat:last-child{border-bottom:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="pub-topbar">
+  <a href="/" class="pub-logo">
+    <div class="pub-logo-icon">💚</div>
+    <span class="pub-logo-text">Socorro<span>AO</span></span>
+  </a>
+  <div class="pub-topbar-links">
+    <a href="{% url 'reportar_publico' %}" class="pub-topbar-link">Reportar Emergência</a>
+    <a href="{% url 'login' %}" class="pub-topbar-link cta">Entrar</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="vol-hero">
+  <div class="vol-hero-pill">💚 Voluntariado — Angola</div>
+  <h1>Torne-se Voluntário<br>do SocorroAO</h1>
+  <p>Cadastre-se gratuitamente e faça parte da maior rede de resposta a emergências de Angola. A sua ajuda salva vidas.</p>
+  <div class="vol-hero-stats">
+    <div class="vol-hero-stat">
+      <div class="vol-hero-stat-num">12+</div>
+      <div class="vol-hero-stat-label">Voluntários Activos</div>
+    </div>
+    <div class="vol-hero-stat">
+      <div class="vol-hero-stat-num">18</div>
+      <div class="vol-hero-stat-label">Províncias</div>
+    </div>
+    <div class="vol-hero-stat">
+      <div class="vol-hero-stat-num">0 Kz</div>
+      <div class="vol-hero-stat-label">Custo (gratuito)</div>
+    </div>
+  </div>
+</div>
+
+<!-- WHY BE A VOLUNTEER -->
+<div class="why-section">
+  <div class="section-label">Porquê ser voluntário?</div>
+  <div class="why-grid">
+    <div class="why-card">
+      <div class="why-emoji">🆘</div>
+      <div><div class="why-title">Salva Vidas</div><div class="why-desc">Você é o primeiro a responder quando uma comunidade precisa de ajuda urgente.</div></div>
+    </div>
+    <div class="why-card">
+      <div class="why-emoji">📱</div>
+      <div><div class="why-title">Sempre Conectado</div><div class="why-desc">Recebe alertas de incidentes próximos de si em tempo real pelo sistema.</div></div>
+    </div>
+    <div class="why-card">
+      <div class="why-emoji">🏅</div>
+      <div><div class="why-title">Reconhecimento</div><div class="why-desc">As suas missões são registadas e reconhecidas com certificados e ranking.</div></div>
+    </div>
+    <div class="why-card">
+      <div class="why-emoji">🤝</div>
+      <div><div class="why-title">Rede de Apoio</div><div class="why-desc">Faça parte de uma comunidade de voluntários comprometidos com Angola.</div></div>
+    </div>
+    <div class="why-card">
+      <div class="why-emoji">📚</div>
+      <div><div class="why-title">Formação</div><div class="why-desc">Acesso a treinos e materiais sobre resposta a emergências humanitárias.</div></div>
+    </div>
+    <div class="why-card">
+      <div class="why-emoji">🇦🇴</div>
+      <div><div class="why-title">Orgulho Nacional</div><div class="why-desc">Contribua para o desenvolvimento e resiliência de Angola.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="pub-form-wrap">
+  <div class="section-label" style="margin-bottom:18px;">Formulário de Cadastro</div>
+
+  <form method="post" enctype="multipart/form-data" id="volForm">
+    {% csrf_token %}
+
+    <!-- 1. Dados pessoais -->
+    <div class="form-card">
+      <div class="form-card-head">
+        <div class="form-card-icon">👤</div>
+        <div>
+          <div class="form-card-title">Dados Pessoais <span style="color:var(--red);">*</span></div>
+          <div class="form-card-subtitle">As suas informações são usadas apenas para coordenação de emergências</div>
+        </div>
+      </div>
+      <div class="form-card-body">
+        <div class="fg">
+          <label class="fl" for="nome">Nome Completo <span class="req">*</span></label>
+          <input type="text" id="nome" name="nome" class="fi" required
+            placeholder="O seu nome completo" autocapitalize="words" autocomplete="name">
+        </div>
+        <div class="fg grid2">
+          <div>
+            <label class="fl" for="telefone">Telefone <span class="req">*</span></label>
+            <input type="tel" id="telefone" name="telefone" class="fi" required
+              placeholder="+244 9XX XXX XXX" autocomplete="tel" inputmode="tel">
+          </div>
+          <div>
+            <label class="fl" for="email">Email</label>
+            <input type="email" id="email" name="email" class="fi"
+              placeholder="nome@email.ao" autocomplete="email" inputmode="email">
+          </div>
+        </div>
+        <div class="fg">
+          <label class="fl" for="numero_bi">Número do Bilhete de Identidade</label>
+          <input type="text" id="numero_bi" name="numero_bi" class="fi"
+            placeholder="Ex: 003456789LA040" autocapitalize="characters">
+          <div style="font-size:11.5px;color:var(--text3);margin-top:5px;">Opcional. Necessário para verificação de identidade em missões oficiais.</div>
+        </div>
+        <div class="fg">
+          <label class="fl" for="bio">Apresentação / Motivação</label>
+          <textarea id="bio" name="bio" class="fi" rows="3"
+            placeholder="Conte um pouco sobre si: a sua experiência, motivação para ser voluntário, disponibilidade..." autocapitalize="sentences"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Foto de perfil -->
+    <div class="form-card">
+      <div class="form-card-head">
+        <div class="form-card-icon">📷</div>
+        <div>
+          <div class="form-card-title">Foto de Perfil</div>
+          <div class="form-card-subtitle">Ajuda os coordenadores a identificá-lo no terreno</div>
+        </div>
+      </div>
+      <div class="form-card-body">
+        <div class="photo-zone" id="fotoZone">
+          <input type="file" name="foto" id="fotoInput" accept="image/*"
+            capture="user" onchange="previewFoto(this)">
+          <div id="fotoPlaceholder">
+            <div class="photo-zone-icon">🤳</div>
+            <div class="photo-zone-text">Selfie ou foto de identificação</div>
+            <div class="photo-zone-sub">Toque para fotografar ou escolher da galeria</div>
+          </div>
+          <div class="photo-preview" id="fotoPreview">
+            <img id="fotoImg" src="" alt="Foto de perfil">
+            <div style="font-size:13px;color:var(--green);margin-top:10px;font-weight:600;">✅ Foto seleccionada</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button type="button" onclick="document.getElementById('fotoCam').click()"
+            style="flex:1;background:var(--dark);color:#fff;border:none;border-radius:9px;padding:11px;font-size:13.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+            📷 Tirar Selfie
+          </button>
+          <button type="button" onclick="document.getElementById('fotoGal').click()"
+            style="flex:1;background:var(--bg);color:var(--text);border:1.5px solid var(--border);border-radius:9px;padding:11px;font-size:13.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+            🖼️ Galeria
+          </button>
+        </div>
+        <input type="file" id="fotoCam" accept="image/*" capture="user" style="display:none" onchange="previewFotoAlt(this)">
+        <input type="file" id="fotoGal" accept="image/*" style="display:none" onchange="previewFotoAlt(this)">
+      </div>
+    </div>
+
+    <!-- 3. Localização -->
+    <div class="form-card">
+      <div class="form-card-head">
+        <div class="form-card-icon">📍</div>
+        <div>
+          <div class="form-card-title">Localização <span style="color:var(--red);">*</span></div>
+          <div class="form-card-subtitle">Para matching com incidentes na sua área</div>
+        </div>
+      </div>
+      <div class="form-card-body">
+        <div class="fg grid2">
+          <div>
+            <label class="fl" for="provincia">Província <span class="req">*</span></label>
+            <select id="provincia" name="provincia" class="fi" required>
+              <option value="">Seleccionar...</option>
+              {% for code, name in provincias %}
+              <option value="{{ code }}">{{ name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label class="fl" for="municipio">Município <span class="req">*</span></label>
+            <input type="text" id="municipio" name="municipio" class="fi" required
+              placeholder="Ex: Cazenga" autocapitalize="words">
+          </div>
+        </div>
+        <div class="fg">
+          <label class="fl" for="bairro">Bairro</label>
+          <input type="text" id="bairro" name="bairro" class="fi"
+            placeholder="Ex: Bairro Palanca" autocapitalize="words">
+        </div>
+        <div class="fg">
+          <div class="gps-row">
+            <div style="flex:1;">
+              <label class="fl">Posição GPS (opcional)</label>
+              <div style="display:flex;gap:6px;">
+                <input type="text" id="latitude" name="latitude" class="fi" placeholder="Latitude" readonly style="font-size:12.5px;">
+                <input type="text" id="longitude" name="longitude" class="fi" placeholder="Longitude" readonly style="font-size:12.5px;">
+              </div>
+            </div>
+            <button type="button" class="gps-btn" onclick="getGPS()" id="gpsBtn">
+              📍 <span>GPS</span>
+            </button>
+          </div>
+          <div class="gps-status" id="gpsStatus"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Habilidades -->
+    <div class="form-card">
+      <div class="form-card-head">
+        <div class="form-card-icon">⭐</div>
+        <div>
+          <div class="form-card-title">As minhas Habilidades</div>
+          <div class="form-card-subtitle">Seleccione tudo o que sabe fazer — pode escolher várias</div>
+        </div>
+      </div>
+      <div class="form-card-body">
+        {% regroup habilidades by categoria as hab_groups %}
+        {% for group in hab_groups %}
+        <div class="hab-group-title">{{ group.grouper|capfirst }}</div>
+        <div class="hab-grid">
+          {% for h in group.list %}
+          <div class="hab-chip">
+            <input type="checkbox" name="habilidades" id="hab_{{ h.pk }}" value="{{ h.pk }}" onchange="countHabs()">
+            <label for="hab_{{ h.pk }}">
+              <span class="hab-emoji">{{ h.icone }}</span>
+              {{ h.nome }}
+            </label>
+          </div>
+          {% endfor %}
+        </div>
+        {% endfor %}
+        <div class="hab-selected-count" id="habCount">0 habilidades seleccionadas</div>
+      </div>
+    </div>
+
+    <!-- 5. Disponibilidade -->
+    <div class="form-card">
+      <div class="form-card-head">
+        <div class="form-card-icon">🕐</div>
+        <div>
+          <div class="form-card-title">Disponibilidade</div>
+          <div class="form-card-subtitle">Quando pode estar disponível para missões?</div>
+        </div>
+      </div>
+      <div class="form-card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          {% for val, label, desc, emoji in "disponivel,Disponível Agora,Posso responder a qualquer momento,✅|ocupado,Ocupado Temporariamente,Estou disponível mas com limitações,⏸️|indisponivel,Indisponível,Não posso participar agora,❌"|split:"|" %}
+          {% with parts=val|split:"," %}{% endwith %}
+          {% endfor %}
+          <!-- Manual rendering for clarity -->
+          <div class="sev-opt" style="grid-column:1/-1;">
+            {% comment %}Using direct radio inputs{% endcomment %}
+          </div>
+        </div>
+        <!-- Disponibilidade radios -->
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <label style="display:flex;align-items:center;gap:12px;padding:13px 15px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.18s;background:var(--bg);" id="dispLabelDisp">
+            <input type="radio" name="disponibilidade" value="disponivel" checked style="accent-color:var(--green);width:18px;height:18px;" onchange="highlightDisp()">
+            <div>
+              <div style="font-weight:700;font-size:14px;color:var(--text);">✅ Disponível Agora</div>
+              <div style="font-size:12px;color:var(--text3);">Posso ser activado para qualquer missão de imediato</div>
+            </div>
+          </label>
+          <label style="display:flex;align-items:center;gap:12px;padding:13px 15px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.18s;background:var(--bg);" id="dispLabelOcup">
+            <input type="radio" name="disponibilidade" value="ocupado" style="accent-color:var(--gold);width:18px;height:18px;" onchange="highlightDisp()">
+            <div>
+              <div style="font-weight:700;font-size:14px;color:var(--text);">⏸️ Disponível com Restrições</div>
+              <div style="font-size:12px;color:var(--text3);">Posso ajudar mas com limitações de horário ou mobilidade</div>
+            </div>
+          </label>
+          <label style="display:flex;align-items:center;gap:12px;padding:13px 15px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.18s;background:var(--bg);" id="dispLabelInd">
+            <input type="radio" name="disponibilidade" value="indisponivel" style="accent-color:var(--text3);width:18px;height:18px;" onchange="highlightDisp()">
+            <div>
+              <div style="font-weight:700;font-size:14px;color:var(--text);">❌ Indisponível de Momento</div>
+              <div style="font-size:12px;color:var(--text3);">Registo para ser contactado quando voltar a estar disponível</div>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Termos -->
+    <div class="terms-box">
+      <label class="terms-check" for="termos">
+        <input type="checkbox" id="termos" name="termos" required
+          style="accent-color:var(--green);width:18px;height:18px;flex-shrink:0;margin-top:3px;">
+        <span class="terms-text">
+          Confirmo que os dados fornecidos são verdadeiros e autorizo o SocorroAO a usar os meus contactos para coordenação de emergências humanitárias em Angola. Compreendo que este é um serviço voluntário e sem remuneração.
+        </span>
+      </label>
+    </div>
+
+    <!-- SUBMIT -->
+    <button type="submit" class="pub-submit" id="submitBtn">
+      <div class="spinner" id="submitSpinner"></div>
+      <span id="submitText">💚 Quero Ser Voluntário!</span>
+    </button>
+    <div style="text-align:center;font-size:12.5px;color:var(--text3);margin-top:10px;line-height:1.6;">
+      O cadastro é gratuito e os seus dados são mantidos em segurança.<br>
+      Pode cancelar a qualquer momento contactando a equipa.
+    </div>
+  </form>
+</div>
+
+<div style="text-align:center;padding:20px;font-size:13px;color:var(--text3);">
+  🇦🇴 SocorroAO · <a href="{% url 'home' %}" style="color:var(--green);">Página Inicial</a> · <a href="{% url 'reportar_publico' %}" style="color:var(--red);">Reportar Emergência</a> · <a href="{% url 'login' %}" style="color:var(--blue);">Área de Coordenadores</a>
+</div>
+
+<script>
+// ── GPS ──────────────────────────────────────────────────────────────
+function getGPS() {
+  const btn = document.getElementById('gpsBtn');
+  const status = document.getElementById('gpsStatus');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ <span>...</span>';
+  if (!navigator.geolocation) {
+    status.innerHTML = '<span class="gps-err">GPS não disponível.</span>';
+    btn.disabled = false; btn.innerHTML = '📍 <span>GPS</span>';
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(pos => {
+    document.getElementById('latitude').value = pos.coords.latitude.toFixed(7);
+    document.getElementById('longitude').value = pos.coords.longitude.toFixed(7);
+    status.innerHTML = `<span class="gps-ok">✅ Localização obtida (±${Math.round(pos.coords.accuracy)}m)</span>`;
+    btn.innerHTML = '✅ <span>GPS</span>';
+    btn.style.background = 'var(--green)';
+    btn.disabled = false;
+  }, err => {
+    status.innerHTML = '<span class="gps-err">❌ Não foi possível obter o GPS. Active a localização.</span>';
+    btn.disabled = false; btn.innerHTML = '📍 <span>GPS</span>';
+  }, { enableHighAccuracy: true, timeout: 10000 });
+}
+
+// ── Foto preview ─────────────────────────────────────────────────────
+function previewFoto(input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('fotoImg').src = e.target.result;
+    document.getElementById('fotoPlaceholder').style.display = 'none';
+    document.getElementById('fotoPreview').style.display = 'block';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function previewFotoAlt(input) {
+  if (!input.files || !input.files[0]) return;
+  previewFoto(input);
+  try {
+    const dt = new DataTransfer();
+    dt.items.add(input.files[0]);
+    document.querySelector('input[name="foto"]').files = dt.files;
+  } catch(e) {}
+}
+
+// ── Habilidades counter ───────────────────────────────────────────────
+function countHabs() {
+  const checked = document.querySelectorAll('input[name="habilidades"]:checked').length;
+  const el = document.getElementById('habCount');
+  el.style.display = checked > 0 ? 'block' : 'none';
+  el.textContent = `${checked} habilidade${checked !== 1 ? 's' : ''} seleccionada${checked !== 1 ? 's' : ''}`;
+}
+
+// ── Disponibilidade highlight ─────────────────────────────────────────
+function highlightDisp() {
+  document.querySelectorAll('[id^="dispLabel"]').forEach(l => {
+    l.style.borderColor = 'var(--border)';
+    l.style.background = 'var(--bg)';
+  });
+  const checked = document.querySelector('input[name="disponibilidade"]:checked');
+  if (checked) {
+    const lbl = checked.closest('label');
+    if (lbl) {
+      lbl.style.borderColor = 'var(--green)';
+      lbl.style.background = 'rgba(46,125,82,0.05)';
+    }
+  }
+}
+highlightDisp();
+
+// ── Auto GPS ─────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    if (navigator.geolocation && !document.getElementById('latitude').value) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        document.getElementById('latitude').value = pos.coords.latitude.toFixed(7);
+        document.getElementById('longitude').value = pos.coords.longitude.toFixed(7);
+        document.getElementById('gpsStatus').innerHTML = '<span class="gps-ok">✅ GPS detectado automaticamente</span>';
+        document.getElementById('gpsBtn').style.background = 'var(--green)';
+      }, () => {}, { timeout: 5000 });
+    }
+  }, 1000);
+});
+
+// ── Submit ────────────────────────────────────────────────────────────
+document.getElementById('volForm').addEventListener('submit', function(e) {
+  const nome = document.getElementById('nome').value.trim();
+  const tel = document.getElementById('telefone').value.trim();
+  const prov = document.getElementById('provincia').value;
+  const mun = document.getElementById('municipio').value.trim();
+  const termos = document.getElementById('termos').checked;
+
+  if (!nome || !tel || !prov || !mun) {
+    alert('Por favor preencha todos os campos obrigatórios.');
+    e.preventDefault(); return;
+  }
+  if (!termos) {
+    alert('Por favor confirme os termos de participação voluntária.');
+    e.preventDefault(); return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  document.getElementById('submitSpinner').style.display = 'block';
+  document.getElementById('submitText').textContent = 'A registar...';
+});
+</script>
+</body>
+</html>

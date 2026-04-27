@@ -121,3 +121,46 @@ def atualizar_disponibilidade(request, pk):
         v.save()
         return JsonResponse({'ok': True, 'status': v.disponibilidade})
     return JsonResponse({'ok': False}, status=400)
+
+
+
+
+def registar_publico(request):
+    """Página pública para voluntários se cadastrarem — mobile-first."""
+    habilidades = Habilidade.objects.all()
+    if request.method == 'POST':
+        try:
+            v = Voluntario(
+                nome=request.POST.get('nome', '').strip(),
+                telefone=request.POST.get('telefone', '').strip(),
+                email=request.POST.get('email', '').strip(),
+                provincia=request.POST.get('provincia', ''),
+                municipio=request.POST.get('municipio', '').strip(),
+                bairro=request.POST.get('bairro', '').strip(),
+                bio=request.POST.get('bio', '').strip(),
+                numero_bi=request.POST.get('numero_bi', '').strip(),
+                disponibilidade='disponivel',
+            )
+            lat = request.POST.get('latitude', '').strip()
+            lng = request.POST.get('longitude', '').strip()
+            if lat and lng:
+                v.latitude, v.longitude = lat, lng
+            if request.FILES.get('foto'):
+                v.foto = request.FILES['foto']
+            v.save()
+            ids = request.POST.getlist('habilidades')
+            if ids:
+                v.habilidades.set(ids)
+            return redirect('voluntario_sucesso')
+        except Exception as e:
+            from django.contrib import messages
+            messages.error(request, f'Erro ao cadastrar: {str(e)}')
+
+    return render(request, 'voluntarios/registar_publico.html', {
+        'habilidades': habilidades,
+        'provincias': PROVINCIAS,
+    })
+
+
+def voluntario_sucesso(request):
+    return render(request, 'voluntarios/voluntario_sucesso.html')

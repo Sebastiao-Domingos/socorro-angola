@@ -188,3 +188,48 @@ def novo_relatorio(request, pk):
         v.save()
         messages.success(request, 'Relatório submetido com sucesso!')
     return redirect('incidentes_detalhe', pk=pk)
+
+
+def reportar_publico(request):
+    """Página pública para a população reportar incidentes — mobile-first."""
+    if request.method == 'POST':
+        try:
+            inc = Incidente(
+                titulo=request.POST.get('titulo', '').strip(),
+                descricao=request.POST.get('descricao', '').strip(),
+                tipo=request.POST.get('tipo', 'outro'),
+                severidade=request.POST.get('severidade', 'medio'),
+                provincia=request.POST.get('provincia', '').strip(),
+                municipio=request.POST.get('municipio', '').strip(),
+                bairro=request.POST.get('bairro', '').strip(),
+                pessoas_afetadas=request.POST.get('pessoas_afetadas', 0) or 0,
+                voluntarios_necessarios=5,
+                status='ativo',
+            )
+            lat = request.POST.get('latitude', '').strip()
+            lng = request.POST.get('longitude', '').strip()
+            if lat and lng:
+                inc.latitude, inc.longitude = lat, lng
+            if request.FILES.get('imagem'):
+                inc.imagem = request.FILES['imagem']
+            inc.save()
+            items = CHECKLIST_PADRAO.get(inc.tipo, [])
+            for i, item in enumerate(items):
+                ChecklistItem.objects.create(incidente=inc, descricao=item, ordem=i)
+            # Return success page or JSON
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                from django.http import JsonResponse
+                return JsonResponse({'ok': True, 'id': inc.pk})
+            return redirect('reportar_sucesso')
+        except Exception as e:
+            from django.contrib import messages
+            messages.error(request, f'Erro ao registar: {str(e)}')
+
+    return render(request, 'incidentes/reportar_publico.html', {
+        'tipos': Incidente.TIPOS,
+        'severidades': Incidente.SEVERIDADES,
+    })
+
+
+def reportar_sucesso(request):
+    return render(request, 'incidentes/reportar_sucesso.html')
