@@ -759,270 +759,270 @@
 {% endblock %}
 
 {% block public_content %}
-<div class="home-body noise">
+  <div class="home-body noise">
 
-  <!-- ── Angola flag stripe ── -->
-  <div class="h-angola-stripe"></div>
+    <!-- ── Angola flag stripe ── -->
+    <div class="h-angola-stripe"></div>
 
-  <!-- ── NAVBAR ── -->
-  <nav class="h-nav" id="hNav">
-    <a href="#" class="h-logo">
-      <div class="h-logo-icon">🆘</div>
-      <span class="h-logo-text">Socorro<span>AO</span></span>
-    </a>
-    <div class="h-nav-cta">
-      <span style="font-size:22px;" title="República de Angola">🇦🇴</span>
-      <a href="{% url 'login' %}" class="h-btn-enter">
-        Entrar no Sistema
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+    <!-- ── NAVBAR ── -->
+    <nav class="h-nav" id="hNav">
+      <a href="#" class="h-logo">
+        <div class="h-logo-icon">🆘</div>
+        <span class="h-logo-text">Socorro<span>AO</span></span>
       </a>
-    </div>
-  </nav>
-
-  <!-- ── HERO ── -->
-  <section class="h-hero">
-    <div class="h-hero-bg"></div>
-    <div class="h-hero-grid"></div>
-
-    <div class="h-hero-content">
-      <!-- LEFT: Copy -->
-      <div>
-        <div class="h-pill">
-          <div class="h-pill-dot"></div>
-          <span class="h-pill-text">Sistema Activo — Angola</span>
-        </div>
-
-        <h1 class="h-headline">
-          Coordenação<br>
-          <span class="accent">Inteligente</span><br>
-          de Desastres
-        </h1>
-
-        <p class="h-sub">
-          A plataforma nacional que transforma a resposta a emergências em Angola — conectando voluntários, coordenando recursos e salvando vidas em tempo real.
-        </p>
-
-        <div class="h-actions">
-          <a href="{% url 'login' %}" class="h-btn-enter" style="padding:12px 28px;font-size:14.5px;border-radius:9px;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-            Aceder ao Dashboard
-          </a>
-          <a href="#funcionalidades" class="h-btn-secondary">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg>
-            Ver Funcionalidades
-          </a>
-        </div>
-
-        <!-- Stats row -->
-        <div class="h-stats-row">
-          <div class="h-stat">
-            <div class="h-stat-num" style="color:var(--h-red);">{{ stats.incidentes_ativos }}</div>
-            <div class="h-stat-label">Incidentes Activos</div>
-          </div>
-          <div class="h-stat">
-            <div class="h-stat-num" style="color:#fff;">{{ stats.voluntarios }}</div>
-            <div class="h-stat-label">Voluntários</div>
-          </div>
-          <div class="h-stat">
-            <div class="h-stat-num" style="color:var(--h-gold);">{{ stats.pessoas_ajudadas|intcomma }}</div>
-            <div class="h-stat-label">Alcançadas</div>
-          </div>
-          <div class="h-stat">
-            <div class="h-stat-num" style="color:var(--h-green);">{{ stats.centrais }}</div>
-            <div class="h-stat-label">Centrais</div>
-          </div>
-        </div>
+      <div class="h-nav-cta">
+        <span style="font-size:22px;" title="República de Angola">🇦🇴</span>
+        <a href="{% url 'login' %}" class="h-btn-enter">
+          Entrar no Sistema
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
       </div>
+    </nav>
 
-      <!-- RIGHT: Live incidents panel -->
-      <div class="h-float">
-        <div class="h-live-panel">
-          <div class="h-live-header">
-            <div class="h-live-badge">
-              <div class="h-live-indicator"></div>
-              Incidentes em Tempo Real
-            </div>
-            <span style="font-size:12px;color:rgba(240,237,232,0.3);">{{ incidentes_recentes|length }} activos</span>
+    <!-- ── HERO ── -->
+    <section class="h-hero">
+      <div class="h-hero-bg"></div>
+      <div class="h-hero-grid"></div>
+
+      <div class="h-hero-content">
+        <!-- LEFT: Copy -->
+        <div>
+          <div class="h-pill">
+            <div class="h-pill-dot"></div>
+            <span class="h-pill-text">Sistema Activo — Angola</span>
           </div>
-          <div class="h-inc-list">
-            {% for inc in incidentes_recentes %}
-            <div class="h-inc-item">
-              <div class="h-inc-emoji">{{ inc.get_tipo_emoji }}</div>
-              <div class="h-inc-body">
-                <div class="h-inc-title">{{ inc.titulo }}</div>
-                <div class="h-inc-meta">📍 {{ inc.municipio }}, {{ inc.provincia }} &nbsp;·&nbsp; 👥 {{ inc.pessoas_afetadas|intcomma }}</div>
-              </div>
-              <div class="h-sev h-sev-{{ inc.severidade }}">{{ inc.get_severidade_display }}</div>
-            </div>
-            {% empty %}
-            <div class="h-empty-panel">
-              <div style="font-size:32px;margin-bottom:10px;opacity:0.4;">✅</div>
-              Nenhum incidente activo de momento.
-            </div>
-            {% endfor %}
-          </div>
-          <div style="padding:14px 16px;border-top:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between;">
-            <span style="font-size:12px;color:rgba(240,237,232,0.28);">Actualizado em tempo real</span>
-            <a href="{% url 'login' %}" style="font-size:12.5px;color:var(--h-red2);text-decoration:none;font-family:'Syne',sans-serif;font-weight:700;display:flex;align-items:center;gap:4px;">
-              Ver todos
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+
+          <h1 class="h-headline">
+            Coordenação<br>
+            <span class="accent">Inteligente</span><br>
+            de Desastres
+          </h1>
+
+          <p class="h-sub">
+            A plataforma nacional que transforma a resposta a emergências em Angola — conectando voluntários, coordenando recursos e salvando vidas em tempo real.
+          </p>
+
+          <div class="h-actions">
+            <a href="{% url 'login' %}" class="h-btn-enter" style="padding:12px 28px;font-size:14.5px;border-radius:9px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+              Aceder ao Dashboard
+            </a>
+            <a href="#funcionalidades" class="h-btn-secondary">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg>
+              Ver Funcionalidades
             </a>
           </div>
+
+          <!-- Stats row -->
+          <div class="h-stats-row">
+            <div class="h-stat">
+              <div class="h-stat-num" style="color:var(--h-red);">{{ stats.incidentes_ativos }}</div>
+              <div class="h-stat-label">Incidentes Activos</div>
+            </div>
+            <div class="h-stat">
+              <div class="h-stat-num" style="color:#fff;">{{ stats.voluntarios }}</div>
+              <div class="h-stat-label">Voluntários</div>
+            </div>
+            <div class="h-stat">
+              <div class="h-stat-num" style="color:var(--h-gold);">{{ stats.pessoas_ajudadas|intcomma }}</div>
+              <div class="h-stat-label">Alcançadas</div>
+            </div>
+            <div class="h-stat">
+              <div class="h-stat-num" style="color:var(--h-green);">{{ stats.centrais }}</div>
+              <div class="h-stat-label">Centrais</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Live incidents panel -->
+        <div class="h-float">
+          <div class="h-live-panel">
+            <div class="h-live-header">
+              <div class="h-live-badge">
+                <div class="h-live-indicator"></div>
+                Incidentes em Tempo Real
+              </div>
+              <span style="font-size:12px;color:rgba(240,237,232,0.3);">{{ incidentes_recentes|length }} activos</span>
+            </div>
+            <div class="h-inc-list">
+              {% for inc in incidentes_recentes %}
+              <div class="h-inc-item">
+                <div class="h-inc-emoji">{{ inc.get_tipo_emoji }}</div>
+                <div class="h-inc-body">
+                  <div class="h-inc-title">{{ inc.titulo }}</div>
+                  <div class="h-inc-meta">📍 {{ inc.municipio }}, {{ inc.provincia }} &nbsp;·&nbsp; 👥 {{ inc.pessoas_afetadas|intcomma }}</div>
+                </div>
+                <div class="h-sev h-sev-{{ inc.severidade }}">{{ inc.get_severidade_display }}</div>
+              </div>
+              {% empty %}
+              <div class="h-empty-panel">
+                <div style="font-size:32px;margin-bottom:10px;opacity:0.4;">✅</div>
+                Nenhum incidente activo de momento.
+              </div>
+              {% endfor %}
+            </div>
+            <div style="padding:14px 16px;border-top:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:12px;color:rgba(240,237,232,0.28);">Actualizado em tempo real</span>
+              <a href="{% url 'login' %}" style="font-size:12.5px;color:var(--h-red2);text-decoration:none;font-family:'Syne',sans-serif;font-weight:700;display:flex;align-items:center;gap:4px;">
+                Ver todos
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ── IMPACT NUMBERS ── -->
-  <section class="h-impact" id="impacto">
-    <div class="h-impact-inner">
-      <div style="text-align:center;margin-bottom:52px;">
-        <div class="h-section-eyebrow" style="justify-content:center;">Impacto em Angola</div>
-        <div class="h-section-title" style="margin:0 auto;text-align:center;">Números que representam<br>vidas reais</div>
-      </div>
-      <div class="h-impact-grid reveal">
-        <div class="h-impact-item">
-          <div class="h-impact-num" style="color:var(--h-red);">{{ stats.incidentes_ativos }}<span style="font-size:0.5em;color:rgba(240,237,232,0.3);">+</span></div>
-          <div class="h-impact-label">Incidentes Geridos</div>
-          <div class="h-impact-sub">Em todas as 18 províncias</div>
+    <!-- ── IMPACT NUMBERS ── -->
+    <section class="h-impact" id="impacto">
+      <div class="h-impact-inner">
+        <div style="text-align:center;margin-bottom:52px;">
+          <div class="h-section-eyebrow" style="justify-content:center;">Impacto em Angola</div>
+          <div class="h-section-title" style="margin:0 auto;text-align:center;">Números que representam<br>vidas reais</div>
         </div>
-        <div class="h-impact-item">
-          <div class="h-impact-num" style="color:#fff;">{{ stats.voluntarios }}<span style="font-size:0.5em;color:rgba(240,237,232,0.3);">+</span></div>
-          <div class="h-impact-label">Voluntários Activos</div>
-          <div class="h-impact-sub">Disponíveis agora</div>
-        </div>
-        <div class="h-impact-item">
-          <div class="h-impact-num" style="color:var(--h-gold);">{{ stats.pessoas_ajudadas|intcomma }}</div>
-          <div class="h-impact-label">Pessoas Alcançadas</div>
-          <div class="h-impact-sub">Em intervenções directas</div>
-        </div>
-        <div class="h-impact-item">
-          <div class="h-impact-num" style="color:var(--h-green);">{{ stats.centrais }}</div>
-          <div class="h-impact-label">Centrais de Doação</div>
-          <div class="h-impact-sub">Georreferenciadas e activas</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── FEATURES ── -->
-  <section class="h-features" id="funcionalidades">
-    <div style="max-width:1140px;margin:0 auto;">
-      <div class="h-section-eyebrow">Funcionalidades</div>
-      <div class="h-section-title">Tudo o que precisa<br>para coordenar emergências</div>
-
-      <div class="h-features-grid">
-        <div class="h-feat-card c-red reveal">
-          <div class="h-feat-icon c-red">🗺️</div>
-          <div class="h-feat-title">Mapa de Incidentes em Tempo Real</div>
-          <div class="h-feat-desc">Visualize todas as zonas afectadas em Angola com marcadores codificados por severidade — crítico, médio e baixo — sobre mapa OpenStreetMap interactivo.</div>
-        </div>
-        <div class="h-feat-card c-gold reveal reveal-delay-1">
-          <div class="h-feat-icon c-gold">👥</div>
-          <div class="h-feat-title">Banco Inteligente de Voluntários</div>
-          <div class="h-feat-desc">Cadastro por habilidades (saúde, logística, engenharia), disponibilidade em tempo real e geolocalização para matching automático ao incidente mais próximo.</div>
-        </div>
-        <div class="h-feat-card c-green reveal reveal-delay-2">
-          <div class="h-feat-icon c-green">📋</div>
-          <div class="h-feat-title">Checklists Operacionais Automáticas</div>
-          <div class="h-feat-desc">Ao registar um incidente, o sistema gera automaticamente uma lista de acções específica ao tipo de desastre — enchente, incêndio, seca, epidemia e mais.</div>
-        </div>
-        <div class="h-feat-card c-blue reveal reveal-delay-3">
-          <div class="h-feat-icon c-blue">📦</div>
-          <div class="h-feat-title">Centrais de Doação Georreferenciadas</div>
-          <div class="h-feat-desc">Pontos físicos de recolha com controlo de capacidade em tempo real, categorização por tipo de bem e histórico completo de doações recebidas.</div>
-        </div>
-        <div class="h-feat-card c-red reveal reveal-delay-4">
-          <div class="h-feat-icon c-red">📊</div>
-          <div class="h-feat-title">Relatórios de Intervenção</div>
-          <div class="h-feat-desc">Documentação completa pós-missão: acções realizadas, pessoas ajudadas, recursos utilizados e lições aprendidas para melhorar futuras respostas.</div>
-        </div>
-        <div class="h-feat-card c-gold reveal reveal-delay-5">
-          <div class="h-feat-icon c-gold">🌍</div>
-          <div class="h-feat-title">Multilíngue — PT · EN · FR</div>
-          <div class="h-feat-desc">Interface completa em Português, Inglês e Francês. Coordenação com ONGs internacionais, UNOCHA e países vizinhos como a RDC e o Congo-Brazzaville.</div>
+        <div class="h-impact-grid reveal">
+          <div class="h-impact-item">
+            <div class="h-impact-num" style="color:var(--h-red);">{{ stats.incidentes_ativos }}<span style="font-size:0.5em;color:rgba(240,237,232,0.3);">+</span></div>
+            <div class="h-impact-label">Incidentes Geridos</div>
+            <div class="h-impact-sub">Em todas as 18 províncias</div>
+          </div>
+          <div class="h-impact-item">
+            <div class="h-impact-num" style="color:#fff;">{{ stats.voluntarios }}<span style="font-size:0.5em;color:rgba(240,237,232,0.3);">+</span></div>
+            <div class="h-impact-label">Voluntários Activos</div>
+            <div class="h-impact-sub">Disponíveis agora</div>
+          </div>
+          <div class="h-impact-item">
+            <div class="h-impact-num" style="color:var(--h-gold);">{{ stats.pessoas_ajudadas|intcomma }}</div>
+            <div class="h-impact-label">Pessoas Alcançadas</div>
+            <div class="h-impact-sub">Em intervenções directas</div>
+          </div>
+          <div class="h-impact-item">
+            <div class="h-impact-num" style="color:var(--h-green);">{{ stats.centrais }}</div>
+            <div class="h-impact-label">Centrais de Doação</div>
+            <div class="h-impact-sub">Georreferenciadas e activas</div>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ── HOW IT WORKS ── -->
-  <section class="h-how" id="como-funciona">
-    <div style="max-width:1140px;margin:0 auto;">
-      <div style="text-align:center;margin-bottom:56px;">
-        <div class="h-section-eyebrow" style="justify-content:center;">Fluxo Operacional</div>
-        <div class="h-section-title" style="text-align:center;margin:0 auto;">Como o SocorroAO funciona</div>
-      </div>
-      <div class="h-steps reveal">
-        <div class="h-step">
-          <div class="h-step-num">1</div>
-          <div class="h-step-title">Reportar</div>
-          <div class="h-step-desc">Coordenador regista o incidente com tipo, severidade, localização GPS e número de afectados.</div>
-        </div>
-        <div class="h-step">
-          <div class="h-step-num">2</div>
-          <div class="h-step-title">Planear</div>
-          <div class="h-step-desc">Sistema gera checklist automática e sugere voluntários disponíveis por habilidade e proximidade.</div>
-        </div>
-        <div class="h-step">
-          <div class="h-step-num">3</div>
-          <div class="h-step-title">Agir</div>
-          <div class="h-step-desc">Voluntários são alocados, checklist é actualizada em tempo real conforme as tarefas são concluídas.</div>
-        </div>
-        <div class="h-step">
-          <div class="h-step-num">4</div>
-          <div class="h-step-title">Documentar</div>
-          <div class="h-step-desc">Relatório pós-intervenção cria base histórica para melhorar cada resposta futura.</div>
-        </div>
-      </div>
-    </div>
-  </section>
+    <!-- ── FEATURES ── -->
+    <section class="h-features" id="funcionalidades">
+      <div style="max-width:1140px;margin:0 auto;">
+        <div class="h-section-eyebrow">Funcionalidades</div>
+        <div class="h-section-title">Tudo o que precisa<br>para coordenar emergências</div>
 
-  <!-- ── CTA ── -->
-  <section class="h-cta">
-    <div class="h-cta-bg"></div>
-    <div class="h-cta-grid"></div>
-    <div class="h-cta-inner reveal">
-      <div class="h-cta-icon">🆘</div>
-      <h2 class="h-cta-title">Pronto para coordenar?</h2>
-      <p class="h-cta-sub">Aceda ao painel e comece a gerir incidentes, alocar voluntários e salvar vidas em Angola — tudo numa única plataforma.</p>
-      <a href="{% url 'login' %}" class="h-cta-btn">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-        Entrar no Sistema Agora
-      </a>
-      <div class="h-cta-trust">
-        <div class="h-trust-item">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Gratuito para ONGs
-        </div>
-        <div class="h-trust-item">·</div>
-        <div class="h-trust-item">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          100% Responsivo
-        </div>
-        <div class="h-trust-item">·</div>
-        <div class="h-trust-item">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Dados seguros e encriptados
+        <div class="h-features-grid">
+          <div class="h-feat-card c-red reveal">
+            <div class="h-feat-icon c-red">🗺️</div>
+            <div class="h-feat-title">Mapa de Incidentes em Tempo Real</div>
+            <div class="h-feat-desc">Visualize todas as zonas afectadas em Angola com marcadores codificados por severidade — crítico, médio e baixo — sobre mapa OpenStreetMap interactivo.</div>
+          </div>
+          <div class="h-feat-card c-gold reveal reveal-delay-1">
+            <div class="h-feat-icon c-gold">👥</div>
+            <div class="h-feat-title">Banco Inteligente de Voluntários</div>
+            <div class="h-feat-desc">Cadastro por habilidades (saúde, logística, engenharia), disponibilidade em tempo real e geolocalização para matching automático ao incidente mais próximo.</div>
+          </div>
+          <div class="h-feat-card c-green reveal reveal-delay-2">
+            <div class="h-feat-icon c-green">📋</div>
+            <div class="h-feat-title">Checklists Operacionais Automáticas</div>
+            <div class="h-feat-desc">Ao registar um incidente, o sistema gera automaticamente uma lista de acções específica ao tipo de desastre — enchente, incêndio, seca, epidemia e mais.</div>
+          </div>
+          <div class="h-feat-card c-blue reveal reveal-delay-3">
+            <div class="h-feat-icon c-blue">📦</div>
+            <div class="h-feat-title">Centrais de Doação Georreferenciadas</div>
+            <div class="h-feat-desc">Pontos físicos de recolha com controlo de capacidade em tempo real, categorização por tipo de bem e histórico completo de doações recebidas.</div>
+          </div>
+          <div class="h-feat-card c-red reveal reveal-delay-4">
+            <div class="h-feat-icon c-red">📊</div>
+            <div class="h-feat-title">Relatórios de Intervenção</div>
+            <div class="h-feat-desc">Documentação completa pós-missão: acções realizadas, pessoas ajudadas, recursos utilizados e lições aprendidas para melhorar futuras respostas.</div>
+          </div>
+          <div class="h-feat-card c-gold reveal reveal-delay-5">
+            <div class="h-feat-icon c-gold">🌍</div>
+            <div class="h-feat-title">Multilíngue — PT · EN · FR</div>
+            <div class="h-feat-desc">Interface completa em Português, Inglês e Francês. Coordenação com ONGs internacionais, UNOCHA e países vizinhos como a RDC e o Congo-Brazzaville.</div>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ── FOOTER ── -->
-  <footer class="h-footer">
-    <div class="h-footer-left">
-      <div class="h-footer-logo">Socorro<span>AO</span></div>
-      <div class="h-footer-divider"></div>
-      <div class="h-footer-copy">© 2025 — Sistema Nacional de Coordenação de Desastres em Angola</div>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px;">
-      <span class="h-footer-flag">🇦🇴</span>
-      <span style="font-size:12px;color:rgba(240,237,232,0.2);">República de Angola</span>
-    </div>
-  </footer>
+    <!-- ── HOW IT WORKS ── -->
+    <section class="h-how" id="como-funciona">
+      <div style="max-width:1140px;margin:0 auto;">
+        <div style="text-align:center;margin-bottom:56px;">
+          <div class="h-section-eyebrow" style="justify-content:center;">Fluxo Operacional</div>
+          <div class="h-section-title" style="text-align:center;margin:0 auto;">Como o SocorroAO funciona</div>
+        </div>
+        <div class="h-steps reveal">
+          <div class="h-step">
+            <div class="h-step-num">1</div>
+            <div class="h-step-title">Reportar</div>
+            <div class="h-step-desc">Coordenador regista o incidente com tipo, severidade, localização GPS e número de afectados.</div>
+          </div>
+          <div class="h-step">
+            <div class="h-step-num">2</div>
+            <div class="h-step-title">Planear</div>
+            <div class="h-step-desc">Sistema gera checklist automática e sugere voluntários disponíveis por habilidade e proximidade.</div>
+          </div>
+          <div class="h-step">
+            <div class="h-step-num">3</div>
+            <div class="h-step-title">Agir</div>
+            <div class="h-step-desc">Voluntários são alocados, checklist é actualizada em tempo real conforme as tarefas são concluídas.</div>
+          </div>
+          <div class="h-step">
+            <div class="h-step-num">4</div>
+            <div class="h-step-title">Documentar</div>
+            <div class="h-step-desc">Relatório pós-intervenção cria base histórica para melhorar cada resposta futura.</div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-</div>
+    <!-- ── CTA ── -->
+    <section class="h-cta">
+      <div class="h-cta-bg"></div>
+      <div class="h-cta-grid"></div>
+      <div class="h-cta-inner reveal">
+        <div class="h-cta-icon">🆘</div>
+        <h2 class="h-cta-title">Pronto para coordenar?</h2>
+        <p class="h-cta-sub">Aceda ao painel e comece a gerir incidentes, alocar voluntários e salvar vidas em Angola — tudo numa única plataforma.</p>
+        <a href="{% url 'login' %}" class="h-cta-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          Entrar no Sistema Agora
+        </a>
+        <div class="h-cta-trust">
+          <div class="h-trust-item">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Gratuito para ONGs
+          </div>
+          <div class="h-trust-item">·</div>
+          <div class="h-trust-item">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            100% Responsivo
+          </div>
+          <div class="h-trust-item">·</div>
+          <div class="h-trust-item">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Dados seguros e encriptados
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FOOTER ── -->
+    <footer class="h-footer">
+      <div class="h-footer-left">
+        <div class="h-footer-logo">Socorro<span>AO</span></div>
+        <div class="h-footer-divider"></div>
+        <div class="h-footer-copy">© 2025 — Sistema Nacional de Coordenação de Desastres em Angola</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="h-footer-flag">🇦🇴</span>
+        <span style="font-size:12px;color:rgba(240,237,232,0.2);">República de Angola</span>
+      </div>
+    </footer>
+
+  </div>
 
 <script>
 // ── Navbar scroll effect ──────────────────────────────────────────────
