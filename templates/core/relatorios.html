@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load i18n humanize %}
+{% block title %}Relatórios de Intervenção{% endblock %}
+{% block page_title %}Relatórios de Intervenção{% endblock %}
+{% block page_subtitle %}Documentação pós-missão de todos os incidentes{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'analytics' %}" class="btn btn-secondary btn-sm">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+  Ver Analytics
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- KPI bar -->
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:24px;">
+  <div class="stat-card s-blue" style="padding:18px 20px;">
+    <div class="stat-icon" style="background:rgba(26,92,138,0.1);margin-bottom:10px;">📊</div>
+    <div class="stat-num" style="color:var(--blue);font-size:28px;">{{ totais.total_relatorios|default:0 }}</div>
+    <div class="stat-label">Total de Relatórios</div>
+  </div>
+  <div class="stat-card s-green" style="padding:18px 20px;">
+    <div class="stat-icon" style="background:rgba(46,125,82,0.1);margin-bottom:10px;">👥</div>
+    <div class="stat-num" style="color:var(--green);font-size:28px;">{{ totais.total_pessoas|default:0|intcomma }}</div>
+    <div class="stat-label">Pessoas Ajudadas</div>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="card card-p" style="margin-bottom:20px;">
+  <form method="get" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
+    <div style="flex:2;min-width:200px;" class="form-group" style="margin:0;">
+      <label class="form-label">Filtrar por Incidente</label>
+      <select name="incidente" class="form-input">
+        <option value="">Todos os incidentes</option>
+        {% for inc in incidentes %}
+        <option value="{{ inc.id }}" {% if filtros.incidente == inc.id|stringformat:"s" %}selected{% endif %}>{{ inc.titulo }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div style="flex:1;min-width:180px;" class="form-group" style="margin:0;">
+      <label class="form-label">Filtrar por Voluntário</label>
+      <select name="autor" class="form-input">
+        <option value="">Todos os voluntários</option>
+        {% for v in voluntarios %}
+        <option value="{{ v.id }}" {% if filtros.autor == v.id|stringformat:"s" %}selected{% endif %}>{{ v.nome }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button type="submit" class="btn btn-primary" style="padding:10px 18px;">Filtrar</button>
+      {% if filtros.incidente or filtros.autor %}
+      <a href="{% url 'relatorios' %}" class="btn btn-ghost">✕ Limpar</a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+
+{% if relatorios %}
+<div style="display:flex;flex-direction:column;gap:14px;">
+  {% for r in relatorios %}
+  <div class="card" style="overflow:hidden;transition:box-shadow 0.2s;">
+    <!-- Header -->
+    <div style="padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;background:var(--surface2);">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="avatar avatar-md" style="background:var(--green);color:white;flex-shrink:0;">{{ r.autor.iniciais }}</div>
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);">{{ r.autor.nome }}</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px;">
+            Missão em
+            <a href="{% url 'incidentes_detalhe' r.incidente.pk %}" style="color:var(--accent);text-decoration:none;font-weight:600;">{{ r.incidente.titulo }}</a>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="text-align:right;">
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--green);">+{{ r.pessoas_ajudadas }}</div>
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;">Pessoas Ajudadas</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:12px;color:var(--text3);">{{ r.data_criacao|date:"d/m/Y" }}</div>
+          <div style="font-size:11px;color:var(--text3);">{{ r.data_criacao|date:"H:i" }}</div>
+        </div>
+        <!-- Severidade badge do incidente -->
+        <span class="badge badge-{{ r.incidente.severidade }}">{{ r.incidente.get_severidade_display }}</span>
+      </div>
+    </div>
+    <!-- Body -->
+    <div style="padding:18px 22px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;">
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:8px;font-family:'Syne',sans-serif;">Acções Realizadas</div>
+        <p style="font-size:13.5px;color:var(--text2);line-height:1.65;">{{ r.acoes_realizadas }}</p>
+      </div>
+      {% if r.recursos_utilizados %}
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:8px;font-family:'Syne',sans-serif;">Recursos Utilizados</div>
+        <p style="font-size:13.5px;color:var(--text2);line-height:1.65;">{{ r.recursos_utilizados }}</p>
+      </div>
+      {% endif %}
+      {% if r.problemas_encontrados %}
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:8px;font-family:'Syne',sans-serif;">⚠️ Problemas Encontrados</div>
+        <p style="font-size:13.5px;color:var(--text2);line-height:1.65;">{{ r.problemas_encontrados }}</p>
+      </div>
+      {% endif %}
+      {% if r.recomendacoes %}
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--green);margin-bottom:8px;font-family:'Syne',sans-serif;">💡 Recomendações</div>
+        <p style="font-size:13.5px;color:var(--text2);line-height:1.65;">{{ r.recomendacoes }}</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if relatorios.has_other_pages %}
+<div style="display:flex;justify-content:center;align-items:center;gap:8px;margin-top:28px;">
+  {% if relatorios.has_previous %}
+  <a href="?page={{ relatorios.previous_page_number }}&incidente={{ filtros.incidente }}&autor={{ filtros.autor }}" class="btn btn-ghost btn-sm">← Anterior</a>
+  {% endif %}
+  <span style="font-size:13px;color:var(--text3);">{{ relatorios.number }} / {{ relatorios.paginator.num_pages }}</span>
+  {% if relatorios.has_next %}
+  <a href="?page={{ relatorios.next_page_number }}&incidente={{ filtros.incidente }}&autor={{ filtros.autor }}" class="btn btn-ghost btn-sm">Próxima →</a>
+  {% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<div class="card empty-state" style="padding:80px 24px;">
+  <div class="empty-state-icon">📊</div>
+  <div class="empty-state-title">Nenhum relatório encontrado</div>
+  <p style="font-size:13.5px;max-width:360px;margin:0 auto 20px;">Os relatórios são criados pelos voluntários após concluir uma missão numa página de detalhe de incidente.</p>
+  <a href="{% url 'incidentes_lista' %}" class="btn btn-primary">Ver Incidentes</a>
+</div>
+{% endif %}
+{% endblock %}

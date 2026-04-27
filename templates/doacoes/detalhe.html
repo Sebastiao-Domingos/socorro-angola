@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% load i18n humanize %}
+{% block title %}{{ central.nome }}{% endblock %}
+{% block page_title %}{{ central.nome }}{% endblock %}
+{% block topbar_actions %}
+<button onclick="document.getElementById('modalDoar').classList.add('open')" class="btn btn-primary btn-sm">🤝 Registar Doação</button>
+<a href="{% url 'doacoes_editar' central.pk %}" class="btn btn-secondary btn-sm">✏️ Editar</a>
+<a href="{% url 'doacoes_lista' %}" class="btn btn-ghost btn-sm">← Voltar</a>
+{% endblock %}
+
+{% block content %}
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;">
+    <div style="display:flex;flex-direction:column;gap:18px;">
+      <!-- Info card -->
+      <div class="card card-p">
+        <div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;margin-bottom:16px;">
+          <div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+              <span class="badge" style="background:rgba(26,92,138,0.1);color:var(--blue);border:1px solid rgba(26,92,138,0.2);">{{ central.get_tipo_display }}</span>
+              <span class="badge badge-{% if central.status == 'ativo' %}disponivel{% elif central.status == 'cheio' %}ocupado{% else %}indisponivel{% endif %}">{{ central.get_status_display }}</span>
+            </div>
+            <p style="font-size:13px;color:var(--text2);">📍 {{ central.endereco }}</p>
+            <p style="font-size:13px;color:var(--text2);">{{ central.municipio }}, {{ central.provincia }}</p>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:{% if central.status_ocupacao == 'critico' %}var(--accent){% elif central.status_ocupacao == 'medio' %}var(--gold){% else %}var(--green){% endif %};">{{ central.percentual_ocupacao }}%</div>
+            <div style="font-size:11px;color:var(--text3);">de ocupação</div>
+          </div>
+        </div>
+        <div class="progress-bar" style="height:10px;margin-bottom:6px;">
+          <div class="progress-fill" style="width:{{ central.percentual_ocupacao }}%;background:{% if central.status_ocupacao == 'critico' %}var(--accent){% elif central.status_ocupacao == 'medio' %}var(--gold){% else %}var(--green){% endif %};"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3);">
+          <span>{{ central.capacidade_atual }} unidades actuais</span>
+          <span>Capacidade: {{ central.capacidade_total }}</span>
+        </div>
+
+        <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;">
+          <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:var(--text2);">👤 <strong>{{ central.responsavel }}</strong></div>
+          <div style="display:flex;gap:8px;align-items:center;font-size:13px;color:var(--text2);">📞 {{ central.telefone }}</div>
+          {% if central.email %}<div style="display:flex;gap:8px;align-items:center;font-size:13px;color:var(--text2);">✉️ {{ central.email }}</div>{% endif %}
+          {% if central.horario %}<div style="display:flex;gap:8px;align-items:center;font-size:13px;color:var(--text2);">🕐 {{ central.horario }}</div>{% endif %}
+        </div>
+      </div>
+
+      <!-- Histórico de doações -->
+      <div class="card" style="overflow:hidden;">
+        <div style="padding:15px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <h3 style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">📋 Histórico de Doações ({{ total_doacoes }})</h3>
+        </div>
+        {% if doacoes %}
+        <table class="data-table">
+          <thead><tr><th>Doador</th><th>Categoria</th><th>Descrição</th><th>Quantidade</th><th>Data</th></tr></thead>
+          <tbody>
+            {% for d in doacoes %}
+            <tr>
+              <td style="font-size:13px;font-weight:600;">{% if d.doador_anonimo %}🎭 Anónimo{% else %}{{ d.doador_nome }}{% endif %}</td>
+              <td><span class="badge" style="background:var(--surface2);color:var(--text2);border:1px solid var(--border);">{{ d.get_categoria_display }}</span></td>
+              <td style="font-size:13px;color:var(--text2);max-width:200px;">{{ d.descricao|truncatechars:60 }}</td>
+              <td style="font-size:13px;font-weight:600;font-family:'Syne',sans-serif;">{{ d.quantidade }} {{ d.unidade }}</td>
+              <td style="font-size:12px;color:var(--text3);white-space:nowrap;">{{ d.data_doacao|date:"d/m/Y H:i" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% if doacoes.has_other_pages %}
+        <div style="padding:12px 18px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:12px;color:var(--text3);">{{ doacoes.number }}/{{ doacoes.paginator.num_pages }}</span>
+          <div style="display:flex;gap:8px;">
+            {% if doacoes.has_previous %}<a href="?page={{ doacoes.previous_page_number }}" class="btn btn-ghost btn-sm">←</a>{% endif %}
+            {% if doacoes.has_next %}<a href="?page={{ doacoes.next_page_number }}" class="btn btn-ghost btn-sm">→</a>{% endif %}
+          </div>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="empty-state" style="padding:40px;">
+          <div class="empty-state-icon">🎁</div>
+          <div class="empty-state-title">Sem doações ainda</div>
+          <button onclick="document.getElementById('modalDoar').classList.add('open')" class="btn btn-primary" style="margin-top:12px;">Registar Primeira Doação</button>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      {% if central.descricao %}
+      <div class="card card-p">
+        <h3 style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:8px;">Sobre a Central</h3>
+        <p style="font-size:13.5px;color:var(--text2);line-height:1.6;">{{ central.descricao }}</p>
+      </div>
+      {% endif %}
+      {% if central.latitude and central.longitude %}
+      <div class="card" style="overflow:hidden;">
+        <div id="centralMap" style="height:200px;"></div>
+      </div>
+      {% endif %}
+      <div class="card card-p">
+        <div style="font-size:12px;color:var(--text3);">Criada em {{ central.data_criacao|date:"d/m/Y" }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Registar Doação -->
+  <div class="modal-backdrop" id="modalDoar">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;">🤝 Registar Doação</h3>
+        <button onclick="document.getElementById('modalDoar').classList.remove('open')" class="btn btn-ghost btn-sm">✕</button>
+      </div>
+      <form method="post" action="{% url 'doacoes_registar' central.pk %}">
+        {% csrf_token %}
+        <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <input type="checkbox" name="doador_anonimo" id="anonCheck" style="accent-color:var(--accent);" onchange="document.getElementById('doadorNome').disabled=this.checked">
+            <label for="anonCheck" style="font-size:13.5px;color:var(--text2);">Doação anónima</label>
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label class="form-label">Nome do Doador</label>
+            <input type="text" name="doador_nome" id="doadorNome" class="form-input" required placeholder="Nome completo">
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label class="form-label">Telefone do Doador</label>
+            <input type="tel" name="doador_telefone" class="form-input" placeholder="+244 ...">
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label class="form-label">Categoria</label>
+            <select name="categoria" class="form-input">
+              {% for code, label in categorias %}<option value="{{ code }}">{{ label }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label class="form-label">Descrição *</label>
+            <textarea name="descricao" class="form-input" rows="2" required placeholder="O que está a ser doado..."></textarea>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group" style="margin:0;">
+              <label class="form-label">Quantidade</label>
+              <input type="number" name="quantidade" class="form-input" min="1" value="1">
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label class="form-label">Unidade</label>
+              <input type="text" name="unidade" class="form-input" value="unidades" placeholder="ex: kg, litros...">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" onclick="document.getElementById('modalDoar').classList.remove('open')" class="btn btn-ghost">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Registar Doação</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <style>@media(max-width:900px){[style*="grid-template-columns:1fr 320px"]{grid-template-columns:1fr!important}}</style>
+  {% endblock %}
+  {% block extra_js %}
+  {% if central.latitude and central.longitude %}
+    <script>
+      const m = L.map('centralMap', {zoomControl:false,dragging:false,scrollWheelZoom:false}).setView([{{ central.latitude }},{{ central.longitude }}],15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(m);
+      L.circleMarker([{{ central.latitude }},{{ central.longitude }}],{radius:10,fillColor:'#1A5C8A',color:'#fff',weight:2,fillOpacity:0.9}).addTo(m);
+    </script>
+  {% endif %}
+{% endblock %}

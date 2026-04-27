@@ -1,0 +1,101 @@
+
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% if central %}Editar{% else %}Nova{% endif %} Central{% endblock %}
+{% block page_title %}{% if central %}Editar Central{% else %}Nova Central de Doação{% endif %}{% endblock %}
+{% block topbar_actions %}<a href="{% url 'doacoes_lista' %}" class="btn btn-ghost btn-sm">← Voltar</a>{% endblock %}
+
+{% block content %}
+    <div style="max-width:760px;margin:0 auto;">
+        <form method="post">
+            {% csrf_token %}
+            <div class="card" style="margin-bottom:18px;overflow:hidden;">
+            <div style="padding:16px 22px;border-bottom:1px solid var(--border);background:var(--surface2);">
+                <h2 style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">📦 Dados da Central</h2>
+            </div>
+            <div style="padding:22px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div class="form-group" style="grid-column:1/-1;margin:0;">
+                <label class="form-label">Nome da Central *</label>
+                <input type="text" name="nome" class="form-input" required value="{{ central.nome|default:'' }}" placeholder="Ex: Central de Doações do Cazenga">
+                </div>
+                <div class="form-group" style="margin:0;">
+                <label class="form-label">Tipo de Bens *</label>
+                <select name="tipo" class="form-input" required>
+                    {% for code, label in tipos %}<option value="{{ code }}" {% if central.tipo == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                </select>
+                </div>
+                {% if central %}
+                <div class="form-group" style="margin:0;">
+                <label class="form-label">Estado</label>
+                <select name="status" class="form-input">
+                    {% for code, label in status_choices %}<option value="{{ code }}" {% if central.status == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                </select>
+                </div>
+                {% endif %}
+                <div class="form-group" style="margin:0;">
+                <label class="form-label">Responsável *</label>
+                <input type="text" name="responsavel" class="form-input" required value="{{ central.responsavel|default:'' }}" placeholder="Nome do responsável">
+                </div>
+                <div class="form-group" style="margin:0;">
+                <label class="form-label">Telefone *</label>
+                <input type="tel" name="telefone" class="form-input" required value="{{ central.telefone|default:'' }}" placeholder="+244 9XX XXX XXX">
+                </div>
+                <div class="form-group" style="margin:0;">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-input" value="{{ central.email|default:'' }}" placeholder="central@exemplo.ao">
+                </div>
+                <div class="form-group" style="margin:0;">
+                <label class="form-label">Horário de Funcionamento</label>
+                <input type="text" name="horario" class="form-input" value="{{ central.horario|default:'' }}" placeholder="Ex: Seg-Sex 08h-17h">
+                </div>
+                <div class="form-group" style="margin:0;">
+                <label class="form-label">Capacidade Total (unidades)</label>
+                <input type="number" name="capacidade_total" class="form-input" min="1" value="{{ central.capacidade_total|default:'1000' }}">
+                </div>
+                <div class="form-group" style="grid-column:1/-1;margin:0;">
+                <label class="form-label">Descrição</label>
+                <textarea name="descricao" class="form-input" rows="3" placeholder="O que a central aceita, condições de doação...">{{ central.descricao|default:'' }}</textarea>
+                </div>
+            </div>
+            </div>
+            <div class="card" style="margin-bottom:22px;overflow:hidden;">
+            <div style="padding:16px 22px;border-bottom:1px solid var(--border);background:var(--surface2);">
+                <h2 style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">📍 Localização</h2>
+            </div>
+            <div style="padding:22px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div class="form-group" style="margin:0;">
+                <label class="form-label">Província *</label>
+                <input type="text" name="provincia" class="form-input" required value="{{ central.provincia|default:'' }}" placeholder="Ex: Luanda">
+                </div>
+                <div class="form-group" style="margin:0;">
+                <label class="form-label">Município *</label>
+                <input type="text" name="municipio" class="form-input" required value="{{ central.municipio|default:'' }}" placeholder="Ex: Cacuaco">
+                </div>
+                <div class="form-group" style="grid-column:1/-1;margin:0;">
+                <label class="form-label">Endereço Completo *</label>
+                <textarea name="endereco" class="form-input" rows="2" required placeholder="Rua, número, bairro...">{{ central.endereco|default:'' }}</textarea>
+                </div>
+                <div class="form-group" style="margin:0;">
+                <label class="form-label">Coordenadas GPS</label>
+                <div style="display:flex;gap:8px;">
+                    <input type="text" name="latitude" id="lat" class="form-input" value="{{ central.latitude|default:'' }}" placeholder="Latitude">
+                    <input type="text" name="longitude" id="lng" class="form-input" value="{{ central.longitude|default:'' }}" placeholder="Longitude">
+                    <button type="button" onclick="getLocation()" class="btn btn-ghost btn-sm" style="flex-shrink:0;">📍</button>
+                </div>
+                </div>
+            </div>
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:12px;">
+            <a href="{% url 'doacoes_lista' %}" class="btn btn-ghost">Cancelar</a>
+            <button type="submit" class="btn btn-primary" style="padding:11px 28px;">💾 Guardar Central</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        function getLocation(){
+            if(navigator.geolocation){
+                navigator.geolocation.getCurrentPosition(p=>{document.getElementById('lat').value=p.coords.latitude.toFixed(7);document.getElementById('lng').value=p.coords.longitude.toFixed(7);})
+            }
+        }
+    </script>
+{% endblock %}

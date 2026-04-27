@@ -1,0 +1,269 @@
+{% extends 'base.html' %}
+{% load i18n humanize %}
+{% block title %}{{ incidente.titulo }}{% endblock %}
+{% block page_title %}{{ incidente.titulo }}{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'incidentes_lista' %}" class="btn btn-ghost btn-sm">← Voltar</a>
+{% endblock %}
+
+{% block content %}
+<div style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;">
+
+  <!-- LEFT -->
+  <div style="display:flex;flex-direction:column;gap:18px;">
+
+    <!-- Header card -->
+    <div class="card card-p" style="border-left:4px solid {% if incidente.severidade == 'critico' %}var(--accent){% elif incidente.severidade == 'medio' %}var(--gold){% else %}var(--green){% endif %};">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:36px;">{{ incidente.get_tipo_emoji }}</span>
+          <div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+              <span class="badge badge-{{ incidente.severidade }}">{{ incidente.get_severidade_display }}</span>
+              <span class="badge badge-{{ incidente.status }}">{{ incidente.get_status_display }}</span>
+              <span class="badge" style="background:var(--surface2);color:var(--text2);border:1px solid var(--border);">{{ incidente.get_tipo_display }}</span>
+            </div>
+            <p style="font-size:13px;color:var(--text3);">📍 {{ incidente.bairro }}{% if incidente.bairro %}, {% endif %}{{ incidente.municipio }}, {{ incidente.provincia }}</p>
+          </div>
+        </div>
+        <!-- Status form -->
+        <form method="post" action="{% url 'incidentes_status' incidente.pk %}" style="display:flex;gap:8px;align-items:center;">
+          {% csrf_token %}
+          <select name="status" class="form-input" style="width:auto;">
+            {% for code, label in incidente.STATUS %}<option value="{{ code }}" {% if incidente.status == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
+          </select>
+          <button type="submit" class="btn btn-secondary btn-sm">Actualizar</button>
+        </form>
+      </div>
+      <p style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:14px;">{{ incidente.descricao }}</p>
+      <div style="display:flex;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--text3);">
+        <span>👥 <strong style="color:var(--text);">{{ incidente.pessoas_afetadas|intcomma }}</strong> pessoas afectadas</span>
+        <span>⏱️ Duração: <strong style="color:var(--text);">{{ incidente.duracao }}</strong></span>
+        <span>📅 {{ incidente.data_inicio|date:"d/m/Y H:i" }}</span>
+        {% if incidente.reportado_por %}<span>👤 Reportado por {{ incidente.reportado_por.get_full_name|default:incidente.reportado_por.username }}</span>{% endif %}
+      </div>
+    </div>
+
+    <!-- Checklist -->
+    <div class="card" style="overflow:hidden;">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <h3 style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">📋 Checklist Operacional</h3>
+          <p style="font-size:12px;color:var(--text3);margin-top:2px;">{{ concluidos }}/{{ total_checklist }} concluídos</p>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:{% if progresso_checklist == 100 %}var(--green){% elif progresso_checklist >= 50 %}var(--gold){% else %}var(--accent){% endif %};">{{ progresso_checklist }}%</div>
+        </div>
+      </div>
+      <div style="padding:4px 16px;border-bottom:1px solid var(--border);">
+        <div class="progress-bar" style="height:4px;margin:10px 0;">
+          <div class="progress-fill" style="width:{{ progresso_checklist }}%;background:{% if progresso_checklist == 100 %}var(--green){% elif progresso_checklist >= 50 %}var(--gold){% else %}var(--accent){% endif %};"></div>
+        </div>
+      </div>
+      <div style="padding:14px 16px;display:flex;flex-direction:column;gap:8px;">
+        {% for item in checklist %}
+        <div class="checklist-item {% if item.concluido %}done{% endif %}" onclick="toggleItem({{ item.pk }}, {% if item.concluido %}false{% else %}true{% endif %})" id="check-{{ item.pk }}">
+          <div class="check-box">
+            {% if item.concluido %}<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>{% endif %}
+          </div>
+          <span class="check-text" style="font-size:13.5px;color:var(--text2);">{{ item.descricao }}</span>
+        </div>
+        {% empty %}
+        <div class="empty-state" style="padding:24px 0;">
+          <div style="font-size:13px;color:var(--text3);">Nenhum item na checklist.</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Relatórios -->
+    <div class="card" style="overflow:hidden;">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+        <h3 style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">📊 Relatórios de Intervenção</h3>
+        <button onclick="document.getElementById('modalRelatorio').classList.add('open')" class="btn btn-secondary btn-sm">+ Novo Relatório</button>
+      </div>
+      {% if relatorios %}
+      <div style="padding:14px 16px;display:flex;flex-direction:column;gap:12px;">
+        {% for r in relatorios %}
+        <div style="border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div class="avatar avatar-sm" style="background:var(--green);color:white;">{{ r.autor.iniciais }}</div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--text);">{{ r.autor.nome }}</div>
+                <div style="font-size:11px;color:var(--text3);">{{ r.data_criacao|date:"d/m/Y H:i" }}</div>
+              </div>
+            </div>
+            <span style="font-size:13px;color:var(--green);font-weight:600;font-family:'Syne',sans-serif;">+{{ r.pessoas_ajudadas }} ajudadas</span>
+          </div>
+          <p style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:8px;">{{ r.acoes_realizadas }}</p>
+          {% if r.problemas_encontrados %}
+          <div style="background:rgba(200,64,26,0.06);border-radius:7px;padding:10px 12px;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--accent);margin-bottom:4px;">Problemas</div>
+            <div style="font-size:12.5px;color:var(--text2);">{{ r.problemas_encontrados }}</div>
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state" style="padding:32px;">Sem relatórios ainda.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- RIGHT sidebar -->
+  <div style="display:flex;flex-direction:column;gap:16px;">
+    <!-- Voluntários alocados -->
+    <div class="card" style="overflow:hidden;">
+      <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+        <h3 style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;">👥 Equipa ({{ incidente.voluntarios_alocados.count }}/{{ incidente.voluntarios_necessarios }})</h3>
+        <button onclick="document.getElementById('modalAlocar').classList.add('open')" class="btn btn-secondary btn-sm">+ Alocar</button>
+      </div>
+      <div style="padding:12px;">
+        <div class="progress-bar" style="margin-bottom:12px;">
+          <div class="progress-fill" style="width:{{ incidente.progresso_voluntarios }}%;background:{% if incidente.progresso_voluntarios >= 100 %}var(--green){% elif incidente.progresso_voluntarios >= 50 %}var(--gold){% else %}var(--accent){% endif %};"></div>
+        </div>
+        {% for v in voluntarios_alocados %}
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 6px;border-radius:7px;transition:background 0.15s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">
+          <div class="avatar avatar-sm" style="background:var(--accent);color:white;">{{ v.iniciais }}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:12.5px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ v.nome }}</div>
+            <div style="font-size:10.5px;color:var(--text3);">{{ v.municipio }}</div>
+          </div>
+          <form method="post" action="{% url 'incidentes_remover' incidente.pk v.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-ghost btn-sm" style="padding:4px 7px;color:var(--accent);font-size:13px;" title="Remover">✕</button>
+          </form>
+        </div>
+        {% empty %}
+        <div style="font-size:12.5px;color:var(--text3);text-align:center;padding:12px 0;">Nenhum voluntário alocado.</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% if incidente.imagem %}
+    <div class="card" style="overflow:hidden;">
+      <img src="{{ incidente.imagem.url }}" style="width:100%;max-height:200px;object-fit:cover;">
+    </div>
+    {% endif %}
+
+    {% if incidente.latitude and incidente.longitude %}
+    <div class="card" style="overflow:hidden;">
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border);">
+        <h3 style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;">📍 Localização</h3>
+      </div>
+      <div id="miniMap" style="height:200px;"></div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Modal Alocar Voluntário -->
+<div class="modal-backdrop" id="modalAlocar">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;">Alocar Voluntário</h3>
+      <button onclick="document.getElementById('modalAlocar').classList.remove('open')" class="btn btn-ghost btn-sm">✕</button>
+    </div>
+    <form method="post" action="{% url 'incidentes_alocar' incidente.pk %}">
+      {% csrf_token %}
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Voluntário Disponível</label>
+          <select name="voluntario_id" class="form-input" required>
+            <option value="">Seleccionar...</option>
+            {% for v in voluntarios_disponiveis %}
+            <option value="{{ v.pk }}">{{ v.nome }} — {{ v.municipio }} {% if v.habilidades.count %}({{ v.habilidades.count }} hab.){% endif %}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" onclick="document.getElementById('modalAlocar').classList.remove('open')" class="btn btn-ghost">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Alocar Voluntário</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Novo Relatório -->
+<div class="modal-backdrop" id="modalRelatorio">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-header">
+      <h3 style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;">Novo Relatório de Intervenção</h3>
+      <button onclick="document.getElementById('modalRelatorio').classList.remove('open')" class="btn btn-ghost btn-sm">✕</button>
+    </div>
+    <form method="post" action="{% url 'incidentes_relatorio' incidente.pk %}">
+      {% csrf_token %}
+      <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;">
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Voluntário *</label>
+          <select name="voluntario_id" class="form-input" required>
+            <option value="">Seleccionar...</option>
+            {% for v in voluntarios_alocados %}<option value="{{ v.pk }}">{{ v.nome }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Acções Realizadas *</label>
+          <textarea name="acoes_realizadas" class="form-input" rows="3" required placeholder="Descreva as acções realizadas durante a intervenção..."></textarea>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Pessoas Ajudadas</label>
+          <input type="number" name="pessoas_ajudadas" class="form-input" min="0" value="0">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Recursos Utilizados</label>
+          <textarea name="recursos_utilizados" class="form-input" rows="2" placeholder="Ex: 200L de água, 50 kits alimentares..."></textarea>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Problemas Encontrados</label>
+          <textarea name="problemas_encontrados" class="form-input" rows="2" placeholder="Obstáculos, limitações, o que correu mal..."></textarea>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Recomendações</label>
+          <textarea name="recomendacoes" class="form-input" rows="2" placeholder="Sugestões para futuras intervenções..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" onclick="document.getElementById('modalRelatorio').classList.remove('open')" class="btn btn-ghost">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Submeter Relatório</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>@media(max-width:960px){[style*="grid-template-columns:1fr 340px"]{grid-template-columns:1fr!important}}</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function toggleItem(itemId, concluido) {
+  const el = document.getElementById('check-' + itemId);
+  const box = el.querySelector('.check-box');
+  try {
+    const res = await fetch('{% url "incidentes_checklist" incidente.pk %}', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-CSRFToken': getCsrf()},
+      body: JSON.stringify({item_id: itemId, concluido: concluido})
+    });
+    const data = await res.json();
+    if (data.ok) {
+      el.classList.toggle('done', concluido);
+      box.innerHTML = concluido ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : '';
+      el.onclick = () => toggleItem(itemId, !concluido);
+    }
+  } catch(e) { console.error(e); }
+}
+
+{% if incidente.latitude and incidente.longitude %}
+const miniMap = L.map('miniMap', {zoomControl:false, dragging:false, scrollWheelZoom:false})
+  .setView([{{ incidente.latitude }}, {{ incidente.longitude }}], 14);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(miniMap);
+L.circleMarker([{{ incidente.latitude }}, {{ incidente.longitude }}], {
+  radius:10, fillColor:'{{ incidente.severidade }}'==='critico'?'#C8401A':'{{ incidente.severidade }}'==='medio'?'#D4A843':'#2E7D52',
+  color:'#fff', weight:2, fillOpacity:0.9
+}).addTo(miniMap);
+{% endif %}
+</script>
+{% endblock %}

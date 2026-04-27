@@ -1,0 +1,1083 @@
+{% extends 'base.html' %}
+{% load i18n humanize static %}
+
+{% block extra_head %}
+<style>
+/* ── HOME PAGE EXCLUSIVE STYLES ─────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
+
+:root {
+  --h-red: #C8401A;
+  --h-red2: #E85C35;
+  --h-gold: #D4A843;
+  --h-green: #2E7D52;
+  --h-blue: #1A5C8A;
+  --h-dark: #0D0B09;
+  --h-dark2: #130F0C;
+  --h-light: #F7F3EE;
+  --h-warm: #EDE8E0;
+}
+
+.home-body { font-family: 'DM Sans', sans-serif; background: var(--h-dark); color: #fff; overflow-x: hidden; }
+
+/* ── NOISE TEXTURE overlay ── */
+.noise::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.4;
+}
+
+/* ── NAVBAR ── */
+.h-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 900;
+  padding: 0 48px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  transition: background 0.4s, backdrop-filter 0.4s;
+}
+.h-nav.scrolled {
+  background: rgba(13,11,9,0.85);
+  backdrop-filter: blur(20px);
+}
+.h-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.h-logo-icon {
+  width: 38px; height: 38px;
+  background: var(--h-red);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 19px;
+  box-shadow: 0 0 20px rgba(200,64,26,0.4);
+  transition: box-shadow 0.3s;
+}
+.h-logo-icon:hover { box-shadow: 0 0 30px rgba(200,64,26,0.6); }
+.h-logo-text {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 18px;
+  color: #fff;
+  letter-spacing: 0.3px;
+}
+.h-logo-text span { color: var(--h-red2); }
+.h-nav-cta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.h-btn-enter {
+  background: var(--h-red);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 22px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 13.5px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: all 0.2s;
+  box-shadow: 0 0 0 0 rgba(200,64,26,0.4);
+}
+.h-btn-enter:hover {
+  background: var(--h-red2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(200,64,26,0.45);
+}
+
+/* ── HERO SECTION ── */
+.h-hero {
+  min-height: 100vh;
+  padding: 68px 0 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.h-hero-bg {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse 80% 60% at 65% 40%, rgba(200,64,26,0.09) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(212,168,67,0.05) 0%, transparent 50%),
+    linear-gradient(180deg, #0D0B09 0%, #130F0C 100%);
+}
+/* Grid pattern */
+.h-hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 20%, transparent 80%);
+}
+
+.h-hero-content {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  padding: 60px 72px 80px;
+  position: relative;
+  z-index: 10;
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ── STATUS PILL ── */
+.h-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(200,64,26,0.12);
+  border: 1px solid rgba(200,64,26,0.28);
+  border-radius: 100px;
+  padding: 6px 16px 6px 10px;
+  margin-bottom: 28px;
+}
+.h-pill-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--h-red);
+  animation: hpulse 2s ease infinite;
+  box-shadow: 0 0 0 0 rgba(200,64,26,0.5);
+}
+@keyframes hpulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(200,64,26,0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(200,64,26,0); }
+}
+.h-pill-text {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--h-red2);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+/* ── HEADING ── */
+.h-headline {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(42px, 5.5vw, 72px);
+  font-weight: 800;
+  line-height: 1.03;
+  color: #fff;
+  margin-bottom: 22px;
+  letter-spacing: -1px;
+}
+.h-headline .accent { color: var(--h-red); position: relative; }
+.h-headline .accent::after {
+  content: '';
+  position: absolute;
+  bottom: 4px; left: 0; right: 0;
+  height: 3px;
+  background: var(--h-red);
+  border-radius: 2px;
+  opacity: 0.4;
+}
+.h-sub {
+  font-size: 16.5px;
+  color: rgba(240,237,232,0.52);
+  line-height: 1.72;
+  margin-bottom: 36px;
+  max-width: 500px;
+}
+.h-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 56px;
+}
+.h-btn-secondary {
+  background: rgba(255,255,255,0.05);
+  color: rgba(240,237,232,0.7);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  padding: 10px 22px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 13.5px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: all 0.2s;
+}
+.h-btn-secondary:hover {
+  background: rgba(255,255,255,0.09);
+  color: #fff;
+  border-color: rgba(255,255,255,0.22);
+}
+
+/* ── MINI STATS ROW ── */
+.h-stats-row {
+  display: flex;
+  gap: 0;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.h-stat {
+  flex: 1;
+  padding: 18px 16px;
+  text-align: center;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  transition: background 0.2s;
+}
+.h-stat:last-child { border-right: none; }
+.h-stat:hover { background: rgba(255,255,255,0.04); }
+.h-stat-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.h-stat-label {
+  font-size: 10px;
+  color: rgba(240,237,232,0.35);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+/* ── RIGHT PANEL — Live incidents ── */
+.h-live-panel {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 18px;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+}
+.h-live-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.h-live-badge {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'Syne', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--h-red2);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.h-live-indicator {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--h-red);
+  animation: hpulse 1.5s ease infinite;
+}
+.h-inc-list {
+  padding: 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+.h-inc-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.05);
+  transition: all 0.2s;
+  cursor: default;
+}
+.h-inc-item:hover {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(200,64,26,0.25);
+}
+.h-inc-emoji { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+.h-inc-body { flex: 1; min-width: 0; }
+.h-inc-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(240,237,232,0.9);
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.h-inc-meta { font-size: 11.5px; color: rgba(240,237,232,0.38); }
+.h-sev {
+  flex-shrink: 0;
+  padding: 3px 9px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.h-sev-critico { background: rgba(200,64,26,0.2); color: #FF7A52; border: 1px solid rgba(200,64,26,0.35); }
+.h-sev-medio { background: rgba(212,168,67,0.2); color: #E4BB5C; border: 1px solid rgba(212,168,67,0.35); }
+.h-sev-baixo { background: rgba(46,125,82,0.2); color: #3DAA6F; border: 1px solid rgba(46,125,82,0.35); }
+.h-empty-panel {
+  padding: 40px 20px;
+  text-align: center;
+  color: rgba(240,237,232,0.25);
+  font-size: 13px;
+}
+
+/* ── SECTION: FEATURES ── */
+.h-features {
+  padding: 100px 72px;
+  background: var(--h-dark2);
+  position: relative;
+}
+.h-features::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200,64,26,0.4), transparent);
+}
+.h-section-eyebrow {
+  font-family: 'Syne', sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--h-red2);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.h-section-eyebrow::before {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 2px;
+  background: var(--h-red);
+  border-radius: 1px;
+}
+.h-section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(28px, 3.5vw, 44px);
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.1;
+  margin-bottom: 56px;
+  max-width: 520px;
+}
+.h-features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  max-width: 1140px;
+  margin: 0 auto;
+}
+.h-feat-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px;
+  padding: 28px 26px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+.h-feat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  border-radius: 16px 16px 0 0;
+  transition: opacity 0.3s;
+  opacity: 0.6;
+}
+.h-feat-card:hover {
+  background: rgba(255,255,255,0.055);
+  border-color: rgba(255,255,255,0.12);
+  transform: translateY(-3px);
+}
+.h-feat-card:hover::before { opacity: 1; }
+.h-feat-card.c-red::before { background: linear-gradient(90deg, var(--h-red), var(--h-red2)); }
+.h-feat-card.c-gold::before { background: linear-gradient(90deg, #A07830, var(--h-gold)); }
+.h-feat-card.c-green::before { background: linear-gradient(90deg, #1A5A35, var(--h-green)); }
+.h-feat-card.c-blue::before { background: linear-gradient(90deg, #0F3A58, var(--h-blue)); }
+.h-feat-icon {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  margin-bottom: 18px;
+}
+.h-feat-icon.c-red { background: rgba(200,64,26,0.15); }
+.h-feat-icon.c-gold { background: rgba(212,168,67,0.12); }
+.h-feat-icon.c-green { background: rgba(46,125,82,0.12); }
+.h-feat-icon.c-blue { background: rgba(26,92,138,0.12); }
+.h-feat-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 15.5px;
+  font-weight: 700;
+  color: rgba(240,237,232,0.92);
+  margin-bottom: 9px;
+}
+.h-feat-desc {
+  font-size: 13.5px;
+  color: rgba(240,237,232,0.42);
+  line-height: 1.65;
+}
+
+/* ── SECTION: IMPACT NUMBERS ── */
+.h-impact {
+  padding: 96px 72px;
+  background: var(--h-dark);
+  position: relative;
+  overflow: hidden;
+}
+.h-impact::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 80% at 0% 50%, rgba(200,64,26,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 100% 50%, rgba(212,168,67,0.04) 0%, transparent 60%);
+}
+.h-impact-inner {
+  max-width: 1140px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+.h-impact-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.h-impact-item {
+  padding: 44px 36px;
+  background: var(--h-dark);
+  text-align: center;
+  position: relative;
+  transition: background 0.25s;
+}
+.h-impact-item:hover { background: rgba(255,255,255,0.02); }
+.h-impact-num {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(36px, 4vw, 56px);
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.h-impact-label {
+  font-size: 12px;
+  color: rgba(240,237,232,0.35);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  font-weight: 600;
+}
+.h-impact-sub {
+  font-size: 11.5px;
+  color: rgba(240,237,232,0.2);
+  margin-top: 5px;
+}
+
+/* ── SECTION: HOW IT WORKS ── */
+.h-how {
+  padding: 96px 72px;
+  background: var(--h-dark2);
+  position: relative;
+}
+.h-how::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+}
+.h-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  max-width: 1140px;
+  margin: 0 auto;
+  position: relative;
+}
+.h-steps::before {
+  content: '';
+  position: absolute;
+  top: 28px;
+  left: calc(12.5% + 28px);
+  right: calc(12.5% + 28px);
+  height: 1px;
+  background: linear-gradient(90deg, rgba(200,64,26,0.4), rgba(200,64,26,0.15), rgba(200,64,26,0.4));
+}
+.h-step {
+  padding: 0 20px;
+  text-align: center;
+  position: relative;
+}
+.h-step-num {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--h-dark);
+  border: 2px solid rgba(200,64,26,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--h-red2);
+  margin: 0 auto 20px;
+  position: relative;
+  z-index: 2;
+  transition: all 0.3s;
+}
+.h-step:hover .h-step-num {
+  background: rgba(200,64,26,0.15);
+  border-color: var(--h-red);
+  box-shadow: 0 0 20px rgba(200,64,26,0.25);
+}
+.h-step-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: rgba(240,237,232,0.88);
+  margin-bottom: 8px;
+}
+.h-step-desc {
+  font-size: 13px;
+  color: rgba(240,237,232,0.38);
+  line-height: 1.6;
+}
+
+/* ── SECTION: CTA ── */
+.h-cta {
+  padding: 100px 72px;
+  background: var(--h-dark);
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+.h-cta-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 70% at 50% 50%, rgba(200,64,26,0.1) 0%, transparent 65%);
+}
+.h-cta-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 50px 50px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 0%, transparent 80%);
+}
+.h-cta-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 600px;
+  margin: 0 auto;
+}
+.h-cta-icon {
+  width: 80px; height: 80px;
+  background: rgba(200,64,26,0.15);
+  border: 1px solid rgba(200,64,26,0.3);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  margin: 0 auto 28px;
+  box-shadow: 0 0 40px rgba(200,64,26,0.2);
+}
+.h-cta-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.08;
+  margin-bottom: 16px;
+}
+.h-cta-sub {
+  font-size: 16px;
+  color: rgba(240,237,232,0.45);
+  margin-bottom: 36px;
+  line-height: 1.65;
+}
+.h-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--h-red);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 15px 36px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.25s;
+  box-shadow: 0 0 0 0 rgba(200,64,26,0.4);
+}
+.h-cta-btn:hover {
+  background: var(--h-red2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(200,64,26,0.45);
+}
+.h-cta-trust {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.h-trust-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: rgba(240,237,232,0.3);
+}
+
+/* ── FOOTER ── */
+.h-footer {
+  background: var(--h-dark2);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding: 28px 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.h-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.h-footer-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  color: rgba(240,237,232,0.5);
+}
+.h-footer-logo span { color: var(--h-red2); }
+.h-footer-divider {
+  width: 1px; height: 16px;
+  background: rgba(255,255,255,0.1);
+}
+.h-footer-copy {
+  font-size: 12.5px;
+  color: rgba(240,237,232,0.25);
+}
+.h-footer-flag { font-size: 20px; }
+
+/* ── SCROLL ANIMATIONS ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
+
+/* ── HERO FLOAT ANIMATION ── */
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+.h-float { animation: float 6s ease-in-out infinite; }
+
+/* ── ANGOLA STRIPE ── */
+.h-angola-stripe {
+  height: 3px;
+  background: linear-gradient(90deg, #CC0000 0%, #CC0000 50%, #000000 50%, #000000 100%);
+  flex-shrink: 0;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1024px) {
+  .h-hero-content { grid-template-columns: 1fr; gap: 48px; padding: 48px 32px 64px; }
+  .h-live-panel { max-width: 520px; }
+  .h-features-grid { grid-template-columns: repeat(2, 1fr); }
+  .h-impact-grid { grid-template-columns: repeat(2, 1fr); }
+  .h-steps { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+  .h-steps::before { display: none; }
+}
+@media (max-width: 768px) {
+  .h-nav { padding: 0 20px; }
+  .h-features { padding: 64px 24px; }
+  .h-impact { padding: 64px 24px; }
+  .h-how { padding: 64px 24px; }
+  .h-cta { padding: 72px 24px; }
+  .h-footer { padding: 20px 24px; }
+  .h-features-grid { grid-template-columns: 1fr; }
+  .h-impact-grid { grid-template-columns: 1fr 1fr; }
+  .h-steps { grid-template-columns: 1fr 1fr; }
+  .h-stats-row { flex-direction: column; }
+  .h-stat { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .h-stat:last-child { border-bottom: none; }
+}
+@media (max-width: 480px) {
+  .h-impact-grid { grid-template-columns: 1fr; }
+  .h-steps { grid-template-columns: 1fr; }
+  .h-headline { letter-spacing: -0.5px; }
+}
+</style>
+{% endblock %}
+
+{% block public_content %}
+<div class="home-body noise">
+
+  <!-- ── Angola flag stripe ── -->
+  <div class="h-angola-stripe"></div>
+
+  <!-- ── NAVBAR ── -->
+  <nav class="h-nav" id="hNav">
+    <a href="#" class="h-logo">
+      <div class="h-logo-icon">🆘</div>
+      <span class="h-logo-text">Socorro<span>AO</span></span>
+    </a>
+    <div class="h-nav-cta">
+      <span style="font-size:22px;" title="República de Angola">🇦🇴</span>
+      <a href="{% url 'login' %}" class="h-btn-enter">
+        Entrar no Sistema
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section class="h-hero">
+    <div class="h-hero-bg"></div>
+    <div class="h-hero-grid"></div>
+
+    <div class="h-hero-content">
+      <!-- LEFT: Copy -->
+      <div>
+        <div class="h-pill">
+          <div class="h-pill-dot"></div>
+          <span class="h-pill-text">Sistema Activo — Angola</span>
+        </div>
+
+        <h1 class="h-headline">
+          Coordenação<br>
+          <span class="accent">Inteligente</span><br>
+          de Desastres
+        </h1>
+
+        <p class="h-sub">
+          A plataforma nacional que transforma a resposta a emergências em Angola — conectando voluntários, coordenando recursos e salvando vidas em tempo real.
+        </p>
+
+        <div class="h-actions">
+          <a href="{% url 'login' %}" class="h-btn-enter" style="padding:12px 28px;font-size:14.5px;border-radius:9px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            Aceder ao Dashboard
+          </a>
+          <a href="#funcionalidades" class="h-btn-secondary">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 14 14"/></svg>
+            Ver Funcionalidades
+          </a>
+        </div>
+
+        <!-- Stats row -->
+        <div class="h-stats-row">
+          <div class="h-stat">
+            <div class="h-stat-num" style="color:var(--h-red);">{{ stats.incidentes_ativos }}</div>
+            <div class="h-stat-label">Incidentes Activos</div>
+          </div>
+          <div class="h-stat">
+            <div class="h-stat-num" style="color:#fff;">{{ stats.voluntarios }}</div>
+            <div class="h-stat-label">Voluntários</div>
+          </div>
+          <div class="h-stat">
+            <div class="h-stat-num" style="color:var(--h-gold);">{{ stats.pessoas_ajudadas|intcomma }}</div>
+            <div class="h-stat-label">Alcançadas</div>
+          </div>
+          <div class="h-stat">
+            <div class="h-stat-num" style="color:var(--h-green);">{{ stats.centrais }}</div>
+            <div class="h-stat-label">Centrais</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Live incidents panel -->
+      <div class="h-float">
+        <div class="h-live-panel">
+          <div class="h-live-header">
+            <div class="h-live-badge">
+              <div class="h-live-indicator"></div>
+              Incidentes em Tempo Real
+            </div>
+            <span style="font-size:12px;color:rgba(240,237,232,0.3);">{{ incidentes_recentes|length }} activos</span>
+          </div>
+          <div class="h-inc-list">
+            {% for inc in incidentes_recentes %}
+            <div class="h-inc-item">
+              <div class="h-inc-emoji">{{ inc.get_tipo_emoji }}</div>
+              <div class="h-inc-body">
+                <div class="h-inc-title">{{ inc.titulo }}</div>
+                <div class="h-inc-meta">📍 {{ inc.municipio }}, {{ inc.provincia }} &nbsp;·&nbsp; 👥 {{ inc.pessoas_afetadas|intcomma }}</div>
+              </div>
+              <div class="h-sev h-sev-{{ inc.severidade }}">{{ inc.get_severidade_display }}</div>
+            </div>
+            {% empty %}
+            <div class="h-empty-panel">
+              <div style="font-size:32px;margin-bottom:10px;opacity:0.4;">✅</div>
+              Nenhum incidente activo de momento.
+            </div>
+            {% endfor %}
+          </div>
+          <div style="padding:14px 16px;border-top:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:12px;color:rgba(240,237,232,0.28);">Actualizado em tempo real</span>
+            <a href="{% url 'login' %}" style="font-size:12.5px;color:var(--h-red2);text-decoration:none;font-family:'Syne',sans-serif;font-weight:700;display:flex;align-items:center;gap:4px;">
+              Ver todos
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── IMPACT NUMBERS ── -->
+  <section class="h-impact" id="impacto">
+    <div class="h-impact-inner">
+      <div style="text-align:center;margin-bottom:52px;">
+        <div class="h-section-eyebrow" style="justify-content:center;">Impacto em Angola</div>
+        <div class="h-section-title" style="margin:0 auto;text-align:center;">Números que representam<br>vidas reais</div>
+      </div>
+      <div class="h-impact-grid reveal">
+        <div class="h-impact-item">
+          <div class="h-impact-num" style="color:var(--h-red);">{{ stats.incidentes_ativos }}<span style="font-size:0.5em;color:rgba(240,237,232,0.3);">+</span></div>
+          <div class="h-impact-label">Incidentes Geridos</div>
+          <div class="h-impact-sub">Em todas as 18 províncias</div>
+        </div>
+        <div class="h-impact-item">
+          <div class="h-impact-num" style="color:#fff;">{{ stats.voluntarios }}<span style="font-size:0.5em;color:rgba(240,237,232,0.3);">+</span></div>
+          <div class="h-impact-label">Voluntários Activos</div>
+          <div class="h-impact-sub">Disponíveis agora</div>
+        </div>
+        <div class="h-impact-item">
+          <div class="h-impact-num" style="color:var(--h-gold);">{{ stats.pessoas_ajudadas|intcomma }}</div>
+          <div class="h-impact-label">Pessoas Alcançadas</div>
+          <div class="h-impact-sub">Em intervenções directas</div>
+        </div>
+        <div class="h-impact-item">
+          <div class="h-impact-num" style="color:var(--h-green);">{{ stats.centrais }}</div>
+          <div class="h-impact-label">Centrais de Doação</div>
+          <div class="h-impact-sub">Georreferenciadas e activas</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FEATURES ── -->
+  <section class="h-features" id="funcionalidades">
+    <div style="max-width:1140px;margin:0 auto;">
+      <div class="h-section-eyebrow">Funcionalidades</div>
+      <div class="h-section-title">Tudo o que precisa<br>para coordenar emergências</div>
+
+      <div class="h-features-grid">
+        <div class="h-feat-card c-red reveal">
+          <div class="h-feat-icon c-red">🗺️</div>
+          <div class="h-feat-title">Mapa de Incidentes em Tempo Real</div>
+          <div class="h-feat-desc">Visualize todas as zonas afectadas em Angola com marcadores codificados por severidade — crítico, médio e baixo — sobre mapa OpenStreetMap interactivo.</div>
+        </div>
+        <div class="h-feat-card c-gold reveal reveal-delay-1">
+          <div class="h-feat-icon c-gold">👥</div>
+          <div class="h-feat-title">Banco Inteligente de Voluntários</div>
+          <div class="h-feat-desc">Cadastro por habilidades (saúde, logística, engenharia), disponibilidade em tempo real e geolocalização para matching automático ao incidente mais próximo.</div>
+        </div>
+        <div class="h-feat-card c-green reveal reveal-delay-2">
+          <div class="h-feat-icon c-green">📋</div>
+          <div class="h-feat-title">Checklists Operacionais Automáticas</div>
+          <div class="h-feat-desc">Ao registar um incidente, o sistema gera automaticamente uma lista de acções específica ao tipo de desastre — enchente, incêndio, seca, epidemia e mais.</div>
+        </div>
+        <div class="h-feat-card c-blue reveal reveal-delay-3">
+          <div class="h-feat-icon c-blue">📦</div>
+          <div class="h-feat-title">Centrais de Doação Georreferenciadas</div>
+          <div class="h-feat-desc">Pontos físicos de recolha com controlo de capacidade em tempo real, categorização por tipo de bem e histórico completo de doações recebidas.</div>
+        </div>
+        <div class="h-feat-card c-red reveal reveal-delay-4">
+          <div class="h-feat-icon c-red">📊</div>
+          <div class="h-feat-title">Relatórios de Intervenção</div>
+          <div class="h-feat-desc">Documentação completa pós-missão: acções realizadas, pessoas ajudadas, recursos utilizados e lições aprendidas para melhorar futuras respostas.</div>
+        </div>
+        <div class="h-feat-card c-gold reveal reveal-delay-5">
+          <div class="h-feat-icon c-gold">🌍</div>
+          <div class="h-feat-title">Multilíngue — PT · EN · FR</div>
+          <div class="h-feat-desc">Interface completa em Português, Inglês e Francês. Coordenação com ONGs internacionais, UNOCHA e países vizinhos como a RDC e o Congo-Brazzaville.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── HOW IT WORKS ── -->
+  <section class="h-how" id="como-funciona">
+    <div style="max-width:1140px;margin:0 auto;">
+      <div style="text-align:center;margin-bottom:56px;">
+        <div class="h-section-eyebrow" style="justify-content:center;">Fluxo Operacional</div>
+        <div class="h-section-title" style="text-align:center;margin:0 auto;">Como o SocorroAO funciona</div>
+      </div>
+      <div class="h-steps reveal">
+        <div class="h-step">
+          <div class="h-step-num">1</div>
+          <div class="h-step-title">Reportar</div>
+          <div class="h-step-desc">Coordenador regista o incidente com tipo, severidade, localização GPS e número de afectados.</div>
+        </div>
+        <div class="h-step">
+          <div class="h-step-num">2</div>
+          <div class="h-step-title">Planear</div>
+          <div class="h-step-desc">Sistema gera checklist automática e sugere voluntários disponíveis por habilidade e proximidade.</div>
+        </div>
+        <div class="h-step">
+          <div class="h-step-num">3</div>
+          <div class="h-step-title">Agir</div>
+          <div class="h-step-desc">Voluntários são alocados, checklist é actualizada em tempo real conforme as tarefas são concluídas.</div>
+        </div>
+        <div class="h-step">
+          <div class="h-step-num">4</div>
+          <div class="h-step-title">Documentar</div>
+          <div class="h-step-desc">Relatório pós-intervenção cria base histórica para melhorar cada resposta futura.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA ── -->
+  <section class="h-cta">
+    <div class="h-cta-bg"></div>
+    <div class="h-cta-grid"></div>
+    <div class="h-cta-inner reveal">
+      <div class="h-cta-icon">🆘</div>
+      <h2 class="h-cta-title">Pronto para coordenar?</h2>
+      <p class="h-cta-sub">Aceda ao painel e comece a gerir incidentes, alocar voluntários e salvar vidas em Angola — tudo numa única plataforma.</p>
+      <a href="{% url 'login' %}" class="h-cta-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Entrar no Sistema Agora
+      </a>
+      <div class="h-cta-trust">
+        <div class="h-trust-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Gratuito para ONGs
+        </div>
+        <div class="h-trust-item">·</div>
+        <div class="h-trust-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          100% Responsivo
+        </div>
+        <div class="h-trust-item">·</div>
+        <div class="h-trust-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Dados seguros e encriptados
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer class="h-footer">
+    <div class="h-footer-left">
+      <div class="h-footer-logo">Socorro<span>AO</span></div>
+      <div class="h-footer-divider"></div>
+      <div class="h-footer-copy">© 2025 — Sistema Nacional de Coordenação de Desastres em Angola</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span class="h-footer-flag">🇦🇴</span>
+      <span style="font-size:12px;color:rgba(240,237,232,0.2);">República de Angola</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+// ── Navbar scroll effect ──────────────────────────────────────────────
+const nav = document.getElementById('hNav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+}, { passive: true });
+
+// ── Scroll reveal ─────────────────────────────────────────────────────
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ── Smooth scroll for anchor links ───────────────────────────────────
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+});
+
+// ── Counter animation for stats ──────────────────────────────────────
+function animateValue(el, target, duration = 1400) {
+  const start = performance.now();
+  const from = 0;
+  const easeOut = t => 1 - Math.pow(1 - t, 3);
+  function step(now) {
+    const t = Math.min((now - start) / duration, 1);
+    const current = Math.round(from + (target - from) * easeOut(t));
+    el.textContent = current.toLocaleString('pt-AO');
+    if (t < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// Animate impact numbers when in view
+const impactObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.currentTarget.querySelectorAll('.h-impact-num').forEach(el => {
+        const raw = el.textContent.replace(/[^\d]/g, '');
+        const val = parseInt(raw);
+        if (!isNaN(val) && val > 0) {
+          const suffix = el.querySelector('span') ? el.querySelector('span').outerHTML : '';
+          el.innerHTML = '';
+          animateValue(el, val);
+          if (suffix) setTimeout(() => el.insertAdjacentHTML('beforeend', suffix), 1400);
+        }
+      });
+      impactObs.unobserve(e.currentTarget);
+    }
+  });
+}, { threshold: 0.3 });
+const impactSection = document.querySelector('.h-impact');
+if (impactSection) impactObs.observe(impactSection);
+</script>
+{% endblock %}

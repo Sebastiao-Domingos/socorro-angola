@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load i18n humanize %}
+{% block title %}{{ voluntario.nome }}{% endblock %}
+{% block page_title %}{{ voluntario.nome }}{% endblock %}
+{% block topbar_actions %}
+    <a href="{% url 'voluntarios_editar' voluntario.pk %}" class="btn btn-secondary btn-sm">✏️ Editar</a>
+    <a href="{% url 'voluntarios_lista' %}" class="btn btn-ghost btn-sm">← Voltar</a>
+{% endblock %}
+
+{% block content %}
+    <div style="display:grid;grid-template-columns:320px 1fr;gap:20px;align-items:start;">
+    <!-- Left: Profile card -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="card" style="padding:28px;text-align:center;">
+        {% if voluntario.foto %}
+        <img src="{{ voluntario.foto.url }}" style="width:88px;height:88px;border-radius:50%;object-fit:cover;margin:0 auto 14px;">
+        {% else %}
+        <div class="avatar avatar-xl" style="background:var(--accent);color:white;margin:0 auto 14px;">{{ voluntario.iniciais }}</div>
+        {% endif %}
+        <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px;">
+            {{ voluntario.nome }}
+            {% if voluntario.verificado %}<span style="color:var(--blue);" title="Verificado">✓</span>{% endif %}
+        </h2>
+        <p style="font-size:13px;color:var(--text3);margin-bottom:14px;">📍 {{ voluntario.municipio }}, {{ voluntario.provincia_display }}</p>
+        <span class="badge badge-{{ voluntario.disponibilidade }}" style="font-size:13px;padding:5px 14px;">{{ voluntario.get_disponibilidade_display }}</span>
+
+        <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:center;">
+            <div>
+            <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--accent);">{{ voluntario.missoes_completadas }}</div>
+            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;">Missões</div>
+            </div>
+            <div>
+            <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--blue);">{{ missoes.count }}</div>
+            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;">Activas</div>
+            </div>
+        </div>
+        </div>
+
+        <div class="card" style="padding:18px;">
+        <h3 style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text);">Contactos</h3>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);">
+            <span style="color:var(--text3);width:18px;">📞</span> {{ voluntario.telefone }}
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);">
+            <span style="color:var(--text3);width:18px;">✉️</span> {{ voluntario.email }}
+            </div>
+            {% if voluntario.bairro %}
+            <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);">
+            <span style="color:var(--text3);width:18px;">🏘️</span> {{ voluntario.bairro }}
+            </div>
+            {% endif %}
+            {% if voluntario.numero_bi %}
+            <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);">
+            <span style="color:var(--text3);width:18px;">🪪</span> BI: {{ voluntario.numero_bi }}
+            </div>
+            {% endif %}
+        </div>
+        </div>
+
+        {% if voluntario.habilidades.all %}
+        <div class="card" style="padding:18px;">
+        <h3 style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:12px;">Habilidades</h3>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            {% for h in voluntario.habilidades.all %}
+            <span style="background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:4px 11px;font-size:12px;color:var(--text2);">{{ h.icone }} {{ h.nome }}</span>
+            {% endfor %}
+        </div>
+        </div>
+        {% endif %}
+
+        <!-- Quick status change -->
+        <div class="card" style="padding:18px;">
+        <h3 style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:12px;">Alterar Disponibilidade</h3>
+        <form method="post" action="{% url 'voluntarios_disponibilidade' voluntario.pk %}" id="dispForm">
+            {% csrf_token %}
+            <select name="disponibilidade" class="form-input" style="margin-bottom:10px;" onchange="document.getElementById('dispForm').submit()">
+            <option value="disponivel" {% if voluntario.disponibilidade == 'disponivel' %}selected{% endif %}>✅ Disponível</option>
+            <option value="ocupado" {% if voluntario.disponibilidade == 'ocupado' %}selected{% endif %}>🔄 Ocupado</option>
+            <option value="indisponivel" {% if voluntario.disponibilidade == 'indisponivel' %}selected{% endif %}>❌ Indisponível</option>
+            </select>
+        </form>
+        </div>
+    </div>
+
+    <!-- Right: Details -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+        {% if voluntario.bio %}
+        <div class="card card-p">
+        <h3 style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:10px;">Sobre o Voluntário</h3>
+        <p style="font-size:14px;color:var(--text2);line-height:1.7;">{{ voluntario.bio }}</p>
+        </div>
+        {% endif %}
+
+        <div class="card" style="overflow:hidden;">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+            <h3 style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Missões Recentes</h3>
+        </div>
+        {% if missoes %}
+        <table class="data-table">
+            <thead><tr><th>Incidente</th><th>Severidade</th><th>Estado</th><th>Data</th></tr></thead>
+            <tbody>
+            {% for m in missoes %}
+            <tr>
+                <td><a href="{% url 'incidentes_detalhe' m.pk %}" style="font-weight:600;color:var(--text);text-decoration:none;font-size:13px;">{{ m.titulo }}</a></td>
+                <td><span class="badge badge-{{ m.severidade }}">{{ m.get_severidade_display }}</span></td>
+                <td><span class="badge badge-{{ m.status }}">{{ m.get_status_display }}</span></td>
+                <td style="font-size:12px;color:var(--text3);">{{ m.data_inicio|date:"d/m/Y" }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state" style="padding:32px;">
+            <div class="empty-state-icon">📋</div>
+            <div class="empty-state-title">Sem missões ainda</div>
+        </div>
+        {% endif %}
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <div style="font-size:12px;color:var(--text3);">Cadastrado em: {{ voluntario.data_cadastro|date:"d/m/Y" }}</div>
+        <div style="font-size:12px;color:var(--text3);">·</div>
+        <div style="font-size:12px;color:var(--text3);">Actualizado: {{ voluntario.data_atualizacao|date:"d/m/Y H:i" }}</div>
+        </div>
+    </div>
+    </div>
+    <style>@media(max-width:900px){[style*="grid-template-columns:320px"]{grid-template-columns:1fr!important}}</style>
+{% endblock %}

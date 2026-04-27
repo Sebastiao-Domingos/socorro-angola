@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+{% load i18n humanize %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}Visão geral em tempo real — {% now "d/m/Y H:i" %}{% endblock %}
+
+{% block topbar_actions %}
+<a href="{% url 'analytics' %}" class="btn btn-secondary btn-sm">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+  Analytics
+</a>
+<a href="{% url 'incidentes_novo' %}" class="btn btn-primary btn-sm">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  Novo Incidente
+</a>
+{% endblock %}
+
+{% block content %}
+
+<!-- ─── KPI Grid ─────────────────────────────────────────────────────────── -->
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;">
+
+  <div class="stat-card s-red fade-up" style="animation-delay:0.05s;cursor:pointer;" onclick="location.href='{% url 'incidentes_lista' %}?status=ativo'">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">
+      <div class="stat-icon" style="background:rgba(200,64,26,0.1);">🚨</div>
+      {% if stats.incidentes_ativos > 0 %}<span class="pulse-dot critico"></span>{% endif %}
+    </div>
+    <div class="stat-num" style="color:var(--accent);">{{ stats.incidentes_ativos }}</div>
+    <div class="stat-label">Incidentes Activos</div>
+    {% if stats.incidentes_criticos > 0 %}
+    <div style="margin-top:10px;font-size:11.5px;color:var(--accent);background:rgba(200,64,26,0.08);padding:4px 10px;border-radius:6px;display:inline-block;">⚠️ {{ stats.incidentes_criticos }} críticos</div>
+    {% endif %}
+  </div>
+
+  <div class="stat-card s-gold fade-up" style="animation-delay:0.1s;cursor:pointer;" onclick="location.href='{% url 'incidentes_lista' %}?status=em_atendimento'">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">
+      <div class="stat-icon" style="background:rgba(212,168,67,0.1);">🔧</div>
+      <span class="badge" style="background:rgba(212,168,67,0.1);color:var(--gold);border:1px solid rgba(212,168,67,0.2);font-size:10.5px;">Em curso</span>
+    </div>
+    <div class="stat-num" style="color:var(--gold);">{{ stats.incidentes_em_atendimento }}</div>
+    <div class="stat-label">Em Atendimento</div>
+  </div>
+
+  <div class="stat-card s-green fade-up" style="animation-delay:0.15s;cursor:pointer;" onclick="location.href='{% url 'voluntarios_lista' %}?disponibilidade=disponivel'">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">
+      <div class="stat-icon" style="background:rgba(46,125,82,0.1);">👥</div>
+    </div>
+    <div class="stat-num">{{ stats.voluntarios_disponiveis }}</div>
+    <div class="stat-label">Voluntários Disponíveis</div>
+    <div style="margin-top:10px;">
+      <div class="progress-bar">
+        <div class="progress-fill" style="width:{% if stats.total_voluntarios %}{% widthratio stats.voluntarios_disponiveis stats.total_voluntarios 100 %}{% else %}0{% endif %}%;background:var(--green);"></div>
+      </div>
+      <div style="font-size:10.5px;color:var(--text3);margin-top:5px;">{{ stats.voluntarios_ocupados }} ocupados · {{ stats.total_voluntarios }} total</div>
+    </div>
+  </div>
+
+  <div class="stat-card s-blue fade-up" style="animation-delay:0.2s;">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">
+      <div class="stat-icon" style="background:rgba(26,92,138,0.1);">🙏</div>
+      <span style="font-size:11px;color:var(--text3);">+{{ stats.novos_esta_semana }} esta semana</span>
+    </div>
+    <div class="stat-num">{{ stats.pessoas_ajudadas|intcomma }}</div>
+    <div class="stat-label">Pessoas Alcançadas</div>
+  </div>
+</div>
+
+<!-- ─── Row 2: secondary KPIs ─────────────────────────────────────────────── -->
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;">
+  <div class="card" style="padding:16px 20px;display:flex;align-items:center;gap:14px;">
+    <div style="font-size:28px;">✅</div>
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--green);">{{ stats.incidentes_resolvidos }}</div>
+      <div style="font-size:11.5px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;">Resolvidos</div>
+    </div>
+  </div>
+  <div class="card" style="padding:16px 20px;display:flex;align-items:center;gap:14px;">
+    <div style="font-size:28px;">👁️</div>
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--blue);">{{ stats.incidentes_monitoramento }}</div>
+      <div style="font-size:11.5px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;">Monitoramento</div>
+    </div>
+  </div>
+  <div class="card" style="padding:16px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;" onclick="location.href='{% url 'doacoes_lista' %}'">
+    <div style="font-size:28px;">📦</div>
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text);">{{ stats.centrais_ativas }}</div>
+      <div style="font-size:11.5px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;">Centrais Activas</div>
+    </div>
+  </div>
+  <div class="card" style="padding:16px 20px;display:flex;align-items:center;gap:14px;">
+    <div style="font-size:28px;">🎁</div>
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--gold);">{{ stats.doacoes_semana }}</div>
+      <div style="font-size:11.5px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;">Doações esta semana</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Main grid ─────────────────────────────────────────────────────────── -->
+<div style="display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;margin-bottom:20px;">
+
+  <!-- Incidentes recentes table -->
+  <div class="card" style="overflow:hidden;">
+    <div style="padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+      <h2 style="font-family:'Syne',sans-serif;font-size:14.5px;font-weight:700;">🚨 Incidentes Recentes</h2>
+      <a href="{% url 'incidentes_lista' %}" class="btn btn-ghost btn-sm" style="font-size:12px;">Ver todos →</a>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Incidente</th>
+            <th>Local</th>
+            <th>Sev.</th>
+            <th>Estado</th>
+            <th>Voluntários</th>
+            <th>Duração</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for inc in incidentes_recentes %}
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span class="pulse-dot {{ inc.severidade }}"></span>
+                <span style="font-size:18px;">{{ inc.get_tipo_emoji }}</span>
+                <div>
+                  <div style="font-weight:600;font-size:13px;color:var(--text);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ inc.titulo }}</div>
+                  <div style="font-size:11px;color:var(--text3);">{{ inc.data_inicio|date:"d/m H:i" }}</div>
+                </div>
+              </div>
+            </td>
+            <td style="font-size:12.5px;color:var(--text2);">{{ inc.municipio }}</td>
+            <td><span class="badge badge-{{ inc.severidade }}" style="font-size:10px;">{{ inc.get_severidade_display }}</span></td>
+            <td><span class="badge badge-{{ inc.status }}" style="font-size:10px;">{{ inc.get_status_display }}</span></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:5px;">
+                <span style="font-size:12px;font-weight:600;white-space:nowrap;color:{% if inc.voluntarios_alocados.count >= inc.voluntarios_necessarios %}var(--green){% else %}var(--text){% endif %};">{{ inc.voluntarios_alocados.count }}/{{ inc.voluntarios_necessarios }}</span>
+                <div class="progress-bar" style="width:44px;">
+                  <div class="progress-fill" style="width:{{ inc.progresso_voluntarios }}%;background:{% if inc.progresso_voluntarios >= 100 %}var(--green){% elif inc.progresso_voluntarios >= 50 %}var(--gold){% else %}var(--accent){% endif %};"></div>
+                </div>
+              </div>
+            </td>
+            <td style="font-size:12px;color:var(--text3);">{{ inc.duracao }}</td>
+            <td>
+              <a href="{% url 'incidentes_detalhe' inc.pk %}" class="btn btn-ghost btn-sm" style="padding:5px 10px;font-size:12px;">→</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" style="text-align:center;padding:48px;color:var(--text3);font-size:13.5px;">
+              ✅ Nenhum incidente activo de momento.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Right sidebar -->
+  <div style="display:flex;flex-direction:column;gap:16px;">
+
+    <!-- Top voluntários -->
+    <div class="card" style="overflow:hidden;">
+      <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+        <h3 style="font-family:'Syne',sans-serif;font-size:13.5px;font-weight:700;">🏆 Top Voluntários</h3>
+        <a href="{% url 'voluntarios_lista' %}" class="btn btn-ghost btn-sm" style="font-size:11.5px;">Ver →</a>
+      </div>
+      <div style="padding:10px 12px;">
+        {% for v in top_voluntarios %}
+        <a href="{% url 'voluntarios_detalhe' v.pk %}" style="text-decoration:none;display:flex;align-items:center;gap:10px;padding:8px 6px;border-radius:8px;transition:background 0.15s;" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">
+          <div style="width:22px;text-align:center;font-family:'Syne',sans-serif;font-size:12px;font-weight:800;color:{% if forloop.counter == 1 %}var(--gold){% elif forloop.counter == 2 %}var(--text3){% else %}var(--text3){% endif %};">{{ forloop.counter }}</div>
+          <div class="avatar avatar-sm" style="background:var(--accent);color:white;flex-shrink:0;">{{ v.iniciais }}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:12.5px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ v.nome }}</div>
+            <div style="font-size:11px;color:var(--text3);">{{ v.missoes_completadas }} missões</div>
+          </div>
+          <span class="badge badge-{{ v.disponibilidade }}" style="font-size:9px;">{{ v.get_disponibilidade_display }}</span>
+        </a>
+        {% empty %}
+        <div style="padding:20px 0;text-align:center;font-size:13px;color:var(--text3);">Nenhum voluntário ainda.</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Por tipo donut -->
+    <div class="card" style="overflow:hidden;">
+      <div style="padding:14px 18px;border-bottom:1px solid var(--border);">
+        <h3 style="font-family:'Syne',sans-serif;font-size:13.5px;font-weight:700;">📊 Por Tipo</h3>
+      </div>
+      <div style="padding:14px 16px;">
+        {% for item in distribuicao_tipo %}
+        <div style="margin-bottom:11px;">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;">
+            <span style="color:var(--text2);">{{ item.tipo|capfirst }}</span>
+            <span style="font-weight:700;font-family:'Syne',sans-serif;color:var(--text);">{{ item.total }}</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:{% widthratio item.total 10 100 %}%;background:var(--accent);"></div>
+          </div>
+        </div>
+        {% empty %}
+        <p style="font-size:12.5px;color:var(--text3);">Sem dados disponíveis.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Map row ────────────────────────────────────────────────────────────── -->
+{% if incidentes_mapa_json != '[]' %}
+<div class="card" style="overflow:hidden;">
+  <div style="padding:15px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <h2 style="font-family:'Syne',sans-serif;font-size:14.5px;font-weight:700;">🗺️ Mapa de Incidentes Activos</h2>
+      <div style="display:flex;align-items:center;gap:12px;font-size:12px;color:var(--text3);">
+        <span style="display:flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:50%;background:var(--accent);display:inline-block;"></span>Crítico</span>
+        <span style="display:flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:50%;background:var(--gold);display:inline-block;"></span>Médio</span>
+        <span style="display:flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:50%;background:var(--green);display:inline-block;"></span>Baixo</span>
+      </div>
+    </div>
+    <a href="{% url 'mapa' %}" class="btn btn-ghost btn-sm" style="font-size:12px;">Mapa completo →</a>
+  </div>
+  <div id="dashMap" style="height:340px;"></div>
+</div>
+{% endif %}
+
+<style>
+@media(max-width:1200px){ [style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:repeat(2,1fr)!important} }
+@media(max-width:1024px){ [style*="grid-template-columns:1fr 320px"]{grid-template-columns:1fr!important} }
+@media(max-width:640px){ [style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:1fr 1fr!important} }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const _inc = {{ incidentes_mapa_json|safe }};
+if (_inc.length > 0 && document.getElementById('dashMap')) {
+  const map = L.map('dashMap', { zoomControl: false }).setView([-11.2, 17.8], 5);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+  L.control.zoom({ position: 'topright' }).addTo(map);
+  const C = { critico:'#C8401A', medio:'#D4A843', baixo:'#2E7D52' };
+  _inc.forEach(i => {
+    if (!i.latitude || !i.longitude) return;
+    const c = C[i.severidade] || '#9A8F82';
+    L.circleMarker([parseFloat(i.latitude), parseFloat(i.longitude)], {
+      radius: i.severidade==='critico'?11:i.severidade==='medio'?8:6,
+      fillColor:c, color:'#fff', weight:2, opacity:1, fillOpacity:0.88
+    }).bindPopup(`
+      <div style="min-width:170px;font-family:'DM Sans',sans-serif;padding:4px;">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;margin-bottom:7px;">${i.titulo}</div>
+        <div style="font-size:12px;color:#666;margin-bottom:2px;">📍 ${i.municipio}, ${i.provincia}</div>
+        <div style="font-size:12px;color:#666;margin-bottom:9px;">👥 ${i.pessoas_afetadas} afectadas</div>
+        <a href="/incidentes/${i.id}/" style="display:block;text-align:center;background:#C8401A;color:white;border-radius:6px;padding:6px;font-size:12px;font-weight:700;text-decoration:none;font-family:'Syne',sans-serif;">Ver Incidente →</a>
+      </div>`).addTo(map);
+  });
+  const valid = _inc.filter(i => i.latitude && i.longitude);
+  if (valid.length > 0) {
+    try {
+      const group = L.featureGroup(valid.map(i => L.marker([parseFloat(i.latitude), parseFloat(i.longitude)])));
+      map.fitBounds(group.getBounds().pad(0.25));
+    } catch(e) { map.setView([-11.2, 17.8], 5); }
+  }
+}
+</script>
+{% endblock %}

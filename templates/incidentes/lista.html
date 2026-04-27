@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load i18n humanize %}
+{% block title %}Incidentes{% endblock %}
+{% block page_title %}Incidentes{% endblock %}
+{% block page_subtitle %}{{ total }} incidentes registados{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'incidentes_novo' %}" class="btn btn-primary btn-sm">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  Reportar Incidente
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Filters -->
+<div class="card card-p" style="margin-bottom:20px;">
+  <form method="get" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+    <div style="flex:2;min-width:200px;" class="form-group" style="margin:0;">
+      <label class="form-label">Pesquisar</label>
+      <input type="text" name="q" class="form-input" placeholder="Título, descrição, localização..." value="{{ filtros.q }}">
+    </div>
+    <div style="flex:1;min-width:130px;" class="form-group" style="margin:0;">
+      <label class="form-label">Tipo</label>
+      <select name="tipo" class="form-input">
+        <option value="">Todos</option>
+        {% for code, label in tipos %}<option value="{{ code }}" {% if filtros.tipo == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </div>
+    <div style="flex:1;min-width:130px;" class="form-group" style="margin:0;">
+      <label class="form-label">Severidade</label>
+      <select name="severidade" class="form-input">
+        <option value="">Todas</option>
+        {% for code, label in severidades %}<option value="{{ code }}" {% if filtros.severidade == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </div>
+    <div style="flex:1;min-width:130px;" class="form-group" style="margin:0;">
+      <label class="form-label">Estado</label>
+      <select name="status" class="form-input">
+        <option value="">Todos</option>
+        {% for code, label in status_choices %}<option value="{{ code }}" {% if filtros.status == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button type="submit" class="btn btn-primary" style="padding:10px 18px;">Filtrar</button>
+      {% if filtros.q or filtros.tipo or filtros.severidade or filtros.status %}
+      <a href="{% url 'incidentes_lista' %}" class="btn btn-ghost">✕</a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+
+<!-- Table -->
+<div class="card" style="overflow:hidden;">
+  {% if incidentes %}
+  <div style="overflow-x:auto;">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Incidente</th>
+          <th>Localização</th>
+          <th>Severidade</th>
+          <th>Estado</th>
+          <th>Afectados</th>
+          <th>Voluntários</th>
+          <th>Duração</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for inc in incidentes %}
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:9px;">
+              <span class="pulse-dot {{ inc.severidade }}"></span>
+              <span style="font-size:20px;">{{ inc.get_tipo_emoji }}</span>
+              <div>
+                <div style="font-weight:600;font-size:13.5px;color:var(--text);white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis;">{{ inc.titulo }}</div>
+                <div style="font-size:11.5px;color:var(--text3);">{{ inc.data_inicio|date:"d/m H:i" }}</div>
+              </div>
+            </div>
+          </td>
+          <td style="font-size:13px;color:var(--text2);white-space:nowrap;">{{ inc.municipio }}<br><span style="font-size:11px;color:var(--text3);">{{ inc.provincia }}</span></td>
+          <td><span class="badge badge-{{ inc.severidade }}">{{ inc.get_severidade_display }}</span></td>
+          <td><span class="badge badge-{{ inc.status }}">{{ inc.get_status_display }}</span></td>
+          <td style="font-size:13px;font-weight:600;font-family:'Syne',sans-serif;">{{ inc.pessoas_afetadas|intcomma }}</td>
+          <td>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:12.5px;font-weight:600;white-space:nowrap;">{{ inc.voluntarios_alocados.count }}/{{ inc.voluntarios_necessarios }}</span>
+              <div class="progress-bar" style="width:52px;">
+                <div class="progress-fill" style="width:{{ inc.progresso_voluntarios }}%;background:{% if inc.progresso_voluntarios >= 100 %}var(--green){% elif inc.progresso_voluntarios >= 50 %}var(--gold){% else %}var(--accent){% endif %};"></div>
+              </div>
+            </div>
+          </td>
+          <td style="font-size:12.5px;color:var(--text3);">{{ inc.duracao }}</td>
+          <td><a href="{% url 'incidentes_detalhe' inc.pk %}" class="btn btn-ghost btn-sm">Ver →</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <!-- Pagination -->
+  {% if incidentes.has_other_pages %}
+  <div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+    <span style="font-size:13px;color:var(--text3);">Página {{ incidentes.number }} de {{ incidentes.paginator.num_pages }}</span>
+    <div style="display:flex;gap:8px;">
+      {% if incidentes.has_previous %}<a href="?page={{ incidentes.previous_page_number }}&q={{ filtros.q }}&tipo={{ filtros.tipo }}&severidade={{ filtros.severidade }}&status={{ filtros.status }}" class="btn btn-ghost btn-sm">← Anterior</a>{% endif %}
+      {% if incidentes.has_next %}<a href="?page={{ incidentes.next_page_number }}&q={{ filtros.q }}&tipo={{ filtros.tipo }}&severidade={{ filtros.severidade }}&status={{ filtros.status }}" class="btn btn-ghost btn-sm">Próxima →</a>{% endif %}
+    </div>
+  </div>
+  {% endif %}
+  {% else %}
+  <div class="empty-state" style="padding:60px 24px;">
+    <div class="empty-state-icon">🚨</div>
+    <div class="empty-state-title">Nenhum incidente encontrado</div>
+    <p style="font-size:13.5px;margin-bottom:20px;">Ajuste os filtros ou reporte um novo incidente.</p>
+    <a href="{% url 'incidentes_novo' %}" class="btn btn-primary">Reportar Incidente</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

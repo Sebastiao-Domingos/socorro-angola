@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% if voluntario %}Editar{% else %}Novo{% endif %} Voluntário{% endblock %}
+{% block page_title %}{% if voluntario %}Editar Voluntário{% else %}Cadastrar Voluntário{% endif %}{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'voluntarios_lista' %}" class="btn btn-ghost btn-sm">← Voltar</a>
+{% endblock %}
+
+{% block content %}
+    <div style="max-width:780px;margin:0 auto;">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="card" style="margin-bottom:20px;overflow:hidden;">
+        <div style="padding:18px 22px;border-bottom:1px solid var(--border);background:var(--surface2);">
+            <h2 style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;">👤 Dados Pessoais</h2>
+        </div>
+        <div style="padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+            <div class="form-group" style="grid-column:1/-1;margin:0;">
+            <label class="form-label">Nome Completo *</label>
+            <input type="text" name="nome" class="form-input" required value="{{ voluntario.nome|default:'' }}" placeholder="Nome completo do voluntário">
+            </div>
+            <div class="form-group" style="margin:0;">
+            <label class="form-label">Telefone *</label>
+            <input type="tel" name="telefone" class="form-input" required value="{{ voluntario.telefone|default:'' }}" placeholder="+244 9XX XXX XXX">
+            </div>
+            <div class="form-group" style="margin:0;">
+            <label class="form-label">Email *</label>
+            <input type="email" name="email" class="form-input" required value="{{ voluntario.email|default:'' }}" placeholder="email@exemplo.ao">
+            </div>
+            <div class="form-group" style="margin:0;">
+            <label class="form-label">Número de BI</label>
+            <input type="text" name="numero_bi" class="form-input" value="{{ voluntario.numero_bi|default:'' }}" placeholder="Ex: 003456789LA040">
+            </div>
+            <div class="form-group" style="margin:0;">
+            <label class="form-label">Disponibilidade</label>
+            <select name="disponibilidade" class="form-input">
+                <option value="disponivel" {% if voluntario.disponibilidade == 'disponivel' or not voluntario %}selected{% endif %}>✅ Disponível</option>
+                <option value="ocupado" {% if voluntario.disponibilidade == 'ocupado' %}selected{% endif %}>🔄 Ocupado</option>
+                <option value="indisponivel" {% if voluntario.disponibilidade == 'indisponivel' %}selected{% endif %}>❌ Indisponível</option>
+            </select>
+            </div>
+            <div class="form-group" style="grid-column:1/-1;margin:0;">
+            <label class="form-label">Biografia / Apresentação</label>
+            <textarea name="bio" class="form-input" rows="3" placeholder="Breve descrição do voluntário, experiência, motivação...">{{ voluntario.bio|default:'' }}</textarea>
+            </div>
+            <div class="form-group" style="margin:0;">
+            <label class="form-label">Foto de Perfil</label>
+            <input type="file" name="foto" class="form-input" accept="image/*" style="padding:8px;">
+            {% if voluntario.foto %}<div style="margin-top:6px;font-size:12px;color:var(--text3);">Foto actual: <a href="{{ voluntario.foto.url }}" target="_blank" style="color:var(--accent);">ver</a></div>{% endif %}
+            </div>
+        </div>
+        </div>
+
+        <div class="card" style="margin-bottom:20px;overflow:hidden;">
+        <div style="padding:18px 22px;border-bottom:1px solid var(--border);background:var(--surface2);">
+            <h2 style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;">📍 Localização</h2>
+        </div>
+        <div style="padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+            <div class="form-group" style="margin:0;">
+            <label class="form-label">Província *</label>
+            <select name="provincia" class="form-input" required>
+                <option value="">Seleccionar...</option>
+                {% for code, name in provincias %}<option value="{{ code }}" {% if voluntario.provincia == code %}selected{% endif %}>{{ name }}</option>{% endfor %}
+            </select>
+            </div>
+            <div class="form-group" style="margin:0;">
+            <label class="form-label">Município *</label>
+            <input type="text" name="municipio" class="form-input" required value="{{ voluntario.municipio|default:'' }}" placeholder="Ex: Cazenga">
+            </div>
+            <div class="form-group" style="margin:0;">
+            <label class="form-label">Bairro</label>
+            <input type="text" name="bairro" class="form-input" value="{{ voluntario.bairro|default:'' }}" placeholder="Ex: Palanca">
+            </div>
+            <div class="form-group" style="margin:0;">
+            <label class="form-label">Coordenadas GPS</label>
+            <div style="display:flex;gap:8px;">
+                <input type="text" name="latitude" id="lat" class="form-input" value="{{ voluntario.latitude|default:'' }}" placeholder="Latitude">
+                <input type="text" name="longitude" id="lng" class="form-input" value="{{ voluntario.longitude|default:'' }}" placeholder="Longitude">
+                <button type="button" onclick="getLocation()" class="btn btn-ghost btn-sm" title="Usar localização actual" style="flex-shrink:0;">📍</button>
+            </div>
+            </div>
+        </div>
+        </div>
+
+        <div class="card" style="margin-bottom:24px;overflow:hidden;">
+        <div style="padding:18px 22px;border-bottom:1px solid var(--border);background:var(--surface2);">
+            <h2 style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;">⭐ Habilidades</h2>
+            <p style="font-size:12.5px;color:var(--text3);margin-top:4px;">Seleccione todas as habilidades que se aplicam</p>
+        </div>
+        <div style="padding:24px;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;">
+            {% regroup habilidades by categoria as hab_groups %}
+            {% for group in hab_groups %}
+            <div style="grid-column:1/-1;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-top:8px;margin-bottom:4px;font-family:'Syne',sans-serif;">{{ group.grouper }}</div>
+            {% for h in group.list %}
+            <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+                <input type="checkbox" name="habilidades" value="{{ h.pk }}" {% if h in voluntario.habilidades.all %}checked{% endif %} style="accent-color:var(--accent);">
+                <span style="font-size:13px;color:var(--text);">{{ h.icone }} {{ h.nome }}</span>
+            </label>
+            {% endfor %}
+            {% endfor %}
+            </div>
+        </div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:12px;">
+        <a href="{% url 'voluntarios_lista' %}" class="btn btn-ghost">Cancelar</a>
+        <button type="submit" class="btn btn-primary" style="padding:11px 28px;">
+            {{ action|default:"Guardar" }} Voluntário
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+        </div>
+    </form>
+    </div>
+    <script>
+        function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+            document.getElementById('lat').value = pos.coords.latitude.toFixed(7);
+            document.getElementById('lng').value = pos.coords.longitude.toFixed(7);
+            }, err => alert('Não foi possível obter a localização: ' + err.message));
+        }
+        }
+    </script>
+{% endblock %}

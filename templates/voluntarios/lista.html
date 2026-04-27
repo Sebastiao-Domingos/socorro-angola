@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load i18n humanize %}
+{% block title %}Voluntários{% endblock %}
+{% block page_title %}Voluntários{% endblock %}
+{% block page_subtitle %}{{ total }} voluntários registados{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'voluntarios_cadastrar' %}" class="btn btn-primary btn-sm">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  Novo Voluntário
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Filters -->
+<div class="card card-p" style="margin-bottom:20px;">
+  <form method="get" style="display:grid;grid-template-columns:1fr auto auto auto auto;gap:12px;align-items:end;">
+    <div class="form-group" style="margin:0;">
+      <label class="form-label">Pesquisar</label>
+      <input type="text" name="q" class="form-input" placeholder="Nome, município, email..." value="{{ filtros.q }}">
+    </div>
+    <div class="form-group" style="margin:0;">
+      <label class="form-label">Disponibilidade</label>
+      <select name="disponibilidade" class="form-input">
+        <option value="">Todos</option>
+        <option value="disponivel" {% if filtros.disponibilidade == 'disponivel' %}selected{% endif %}>Disponível</option>
+        <option value="ocupado" {% if filtros.disponibilidade == 'ocupado' %}selected{% endif %}>Ocupado</option>
+        <option value="indisponivel" {% if filtros.disponibilidade == 'indisponivel' %}selected{% endif %}>Indisponível</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin:0;">
+      <label class="form-label">Província</label>
+      <select name="provincia" class="form-input">
+        <option value="">Todas</option>
+        {% for code, name in provincias %}<option value="{{ code }}" {% if filtros.provincia == code %}selected{% endif %}>{{ name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="form-group" style="margin:0;">
+      <label class="form-label">Habilidade</label>
+      <select name="habilidade" class="form-input">
+        <option value="">Todas</option>
+        {% for h in habilidades %}<option value="{{ h.pk }}" {% if filtros.habilidade == h.pk|stringformat:"s" %}selected{% endif %}>{{ h }}</option>{% endfor %}
+      </select>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button type="submit" class="btn btn-primary" style="padding:10px 18px;">Filtrar</button>
+      {% if filtros.q or filtros.disponibilidade or filtros.provincia or filtros.habilidade %}
+      <a href="{% url 'voluntarios_lista' %}" class="btn btn-ghost">Limpar</a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+
+<!-- Grid de voluntários -->
+{% if voluntarios %}
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+  {% for v in voluntarios %}
+  <div class="card" style="padding:20px;transition:all 0.2s;">
+    <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;">
+      {% if v.foto %}
+      <img src="{{ v.foto.url }}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;flex-shrink:0;">
+      {% else %}
+      <div class="avatar avatar-md" style="background:var(--accent);color:white;flex-shrink:0;">{{ v.iniciais }}</div>
+      {% endif %}
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          <h3 style="font-family:'Syne',sans-serif;font-size:14.5px;font-weight:700;color:var(--text);">{{ v.nome }}</h3>
+          {% if v.verificado %}<span title="Verificado" style="color:var(--blue);font-size:14px;">✓</span>{% endif %}
+        </div>
+        <div style="font-size:12px;color:var(--text3);">📍 {{ v.municipio }}, {{ v.provincia_display }}</div>
+      </div>
+      <span class="badge badge-{{ v.disponibilidade }}">{{ v.get_disponibilidade_display }}</span>
+    </div>
+
+    {% if v.habilidades.all %}
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;">
+      {% for h in v.habilidades.all|slice:":3" %}
+      <span style="background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:2px 9px;font-size:11px;color:var(--text2);">{{ h.icone }} {{ h.nome }}</span>
+      {% endfor %}
+      {% if v.habilidades.count > 3 %}<span style="font-size:11px;color:var(--text3);padding:2px 6px;">+{{ v.habilidades.count|add:"-3" }}</span>{% endif %}
+    </div>
+    {% endif %}
+
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:12px;color:var(--text3);">🏅 {{ v.missoes_completadas }} missões</div>
+      <a href="{% url 'voluntarios_detalhe' v.pk %}" class="btn btn-ghost btn-sm">Ver perfil</a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if voluntarios.has_other_pages %}
+<div style="display:flex;justify-content:center;align-items:center;gap:8px;margin-top:28px;">
+  {% if voluntarios.has_previous %}
+  <a href="?page={{ voluntarios.previous_page_number }}&q={{ filtros.q }}&disponibilidade={{ filtros.disponibilidade }}&provincia={{ filtros.provincia }}&habilidade={{ filtros.habilidade }}" class="btn btn-ghost btn-sm">← Anterior</a>
+  {% endif %}
+  <span style="font-size:13px;color:var(--text3);">Página {{ voluntarios.number }} de {{ voluntarios.paginator.num_pages }}</span>
+  {% if voluntarios.has_next %}
+  <a href="?page={{ voluntarios.next_page_number }}&q={{ filtros.q }}&disponibilidade={{ filtros.disponibilidade }}&provincia={{ filtros.provincia }}&habilidade={{ filtros.habilidade }}" class="btn btn-ghost btn-sm">Próxima →</a>
+  {% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<div class="card empty-state">
+  <div class="empty-state-icon">👥</div>
+  <div class="empty-state-title">Nenhum voluntário encontrado</div>
+  <p style="font-size:13.5px;margin-bottom:20px;">Tente ajustar os filtros ou cadastre um novo voluntário.</p>
+  <a href="{% url 'voluntarios_cadastrar' %}" class="btn btn-primary">+ Cadastrar Voluntário</a>
+</div>
+{% endif %}
+{% endblock %}

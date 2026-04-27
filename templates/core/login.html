@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block public_content %}
+    <div style="min-height:100vh;background:var(--nav-bg);display:flex;position:relative;overflow:hidden;">
+    <!-- Background pattern -->
+    <div style="position:absolute;inset:0;background-image:radial-gradient(rgba(200,64,26,0.05) 1px,transparent 1px);background-size:28px 28px;"></div>
+    <div style="position:absolute;top:-150px;right:-150px;width:500px;height:500px;background:radial-gradient(circle,rgba(200,64,26,0.1),transparent 70%);"></div>
+
+    <!-- Left branding -->
+    <div style="flex:1;display:none;flex-direction:column;justify-content:center;padding:80px;position:relative;z-index:1;" class="login-left">
+        <div style="margin-bottom:48px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:36px;">
+            <div style="width:44px;height:44px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;">🆘</div>
+            <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#fff;">Socorro<span style="color:var(--accent2);">AO</span></div>
+        </div>
+        <h1 style="font-family:'Syne',sans-serif;font-size:44px;font-weight:800;color:#fff;line-height:1.1;margin-bottom:16px;">A plataforma<br>de coordenação<br><span style="color:var(--accent);">de desastres</span></h1>
+        <p style="font-size:16px;color:rgba(240,237,232,0.5);line-height:1.7;max-width:380px;">Sistema nacional para gestão de voluntários, incidentes e doações em emergências humanitárias em Angola.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+        {% for item in bancos %}{% endfor %}
+        {% for text in bancos_textos%}
+            <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:24px;height:24px;background:rgba(46,125,82,0.2);border:1px solid rgba(46,125,82,0.4);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <span style="font-size:14px;color:rgba(240,237,232,0.6);">{{ text }}</span>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+
+    <!-- Right: Login form -->
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:40px 24px;position:relative;z-index:1;">
+        <div style="width:100%;max-width:400px;">
+        <!-- Logo mobile -->
+        <div style="text-align:center;margin-bottom:36px;">
+            <div style="width:52px;height:52px;background:var(--accent);border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:14px;">🆘</div>
+            <h2 style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#fff;">Bem-vindo de volta</h2>
+            <p style="font-size:14px;color:rgba(240,237,232,0.4);margin-top:6px;">Aceda ao painel de coordenação</p>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:32px;">
+            {% if messages %}
+            {% for message in messages %}
+            <div style="background:rgba(200,64,26,0.15);border:1px solid rgba(200,64,26,0.3);border-radius:8px;padding:11px 14px;margin-bottom:20px;font-size:13.5px;color:var(--accent2);display:flex;align-items:center;gap:8px;">
+            ⚠️ {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label" style="color:rgba(240,237,232,0.5);">Utilizador</label>
+                <input type="text" name="username" class="form-input" placeholder="O seu username" required autofocus
+                style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#fff;">
+            </div>
+            <div class="form-group">
+                <label class="form-label" style="color:rgba(240,237,232,0.5);">Palavra-Passe</label>
+                <div style="position:relative;">
+                <input type="password" name="password" id="pwdInput" class="form-input" placeholder="••••••••" required
+                    style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#fff;">
+                <button type="button" onclick="togglePwd()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:rgba(240,237,232,0.4);font-size:16px;">👁️</button>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:15px;margin-top:8px;">
+                Entrar no Sistema
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+            </form>
+
+            <div style="text-align:center;margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.06);">
+            <p style="font-size:12.5px;color:rgba(240,237,232,0.3);">Não tem acesso? Contacte o administrador do sistema.</p>
+            </div>
+        </div>
+
+        <div style="text-align:center;margin-top:20px;">
+            <a href="{% url 'home' %}" style="font-size:13px;color:rgba(240,237,232,0.35);text-decoration:none;">← Voltar à página inicial</a>
+        </div>
+        </div>
+    </div>
+    </div>
+    <script>
+    function togglePwd() {
+        const i = document.getElementById('pwdInput');
+        i.type = i.type === 'password' ? 'text' : 'password';
+        }
+    </script>
+    <style>
+        @media(min-width:900px) { .login-left { display:flex !important; } }
+    </style>
+{% endblock %}

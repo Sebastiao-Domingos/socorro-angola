@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}Novo Incidente{% endblock %}
+{% block page_title %}Reportar Incidente{% endblock %}
+{% block topbar_actions %}<a href="{% url 'incidentes_lista' %}" class="btn btn-ghost btn-sm">← Voltar</a>{% endblock %}
+
+{% block content %}
+<div style="max-width:820px;margin:0 auto;">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div style="background:rgba(200,64,26,0.06);border:1px solid rgba(200,64,26,0.2);border-radius:10px;padding:14px 18px;margin-bottom:22px;display:flex;align-items:center;gap:10px;">
+      <span style="font-size:20px;">⚠️</span>
+      <p style="font-size:13.5px;color:var(--text2);">Uma checklist operacional será gerada automaticamente com base no tipo de desastre seleccionado.</p>
+    </div>
+
+    <div class="card" style="margin-bottom:18px;overflow:hidden;">
+      <div style="padding:16px 22px;border-bottom:1px solid var(--border);background:var(--surface2);">
+        <h2 style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">🚨 Dados do Incidente</h2>
+      </div>
+      <div style="padding:22px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="form-group" style="grid-column:1/-1;margin:0;">
+          <label class="form-label">Título *</label>
+          <input type="text" name="titulo" class="form-input" required placeholder="Ex: Enchente no Cazenga — Bairro Palanca">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Tipo de Desastre *</label>
+          <select name="tipo" class="form-input" required>
+            <option value="">Seleccionar...</option>
+            {% for code, label in tipos %}<option value="{{ code }}">{{ label }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Nível de Severidade *</label>
+          <select name="severidade" class="form-input" required>
+            {% for code, label in severidades %}<option value="{{ code }}" {% if code == 'medio' %}selected{% endif %}>{{ label }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group" style="grid-column:1/-1;margin:0;">
+          <label class="form-label">Descrição Detalhada *</label>
+          <textarea name="descricao" class="form-input" rows="4" required placeholder="Descreva a situação em detalhe: extensão, causas, condições actuais, necessidades imediatas..."></textarea>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Pessoas Afectadas</label>
+          <input type="number" name="pessoas_afetadas" class="form-input" min="0" placeholder="0" value="0">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Voluntários Necessários</label>
+          <input type="number" name="voluntarios_necessarios" class="form-input" min="1" value="5">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Imagem (opcional)</label>
+          <input type="file" name="imagem" class="form-input" accept="image/*" style="padding:8px;">
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:22px;overflow:hidden;">
+      <div style="padding:16px 22px;border-bottom:1px solid var(--border);background:var(--surface2);">
+        <h2 style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">📍 Localização</h2>
+      </div>
+      <div style="padding:22px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Província *</label>
+          <input type="text" name="provincia" class="form-input" required placeholder="Ex: Luanda">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Município *</label>
+          <input type="text" name="municipio" class="form-input" required placeholder="Ex: Cazenga">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Bairro</label>
+          <input type="text" name="bairro" class="form-input" placeholder="Ex: Palanca">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Coordenadas GPS</label>
+          <div style="display:flex;gap:8px;">
+            <input type="text" name="latitude" id="lat" class="form-input" placeholder="Latitude">
+            <input type="text" name="longitude" id="lng" class="form-input" placeholder="Longitude">
+            <button type="button" onclick="getLocation()" class="btn btn-ghost btn-sm" style="flex-shrink:0;" title="GPS">📍</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;gap:12px;">
+      <a href="{% url 'incidentes_lista' %}" class="btn btn-ghost">Cancelar</a>
+      <button type="submit" class="btn btn-primary" style="padding:11px 28px;background:var(--accent);">
+        🚨 Registar Incidente
+      </button>
+    </div>
+  </form>
+</div>
+<script>
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(p => {
+      document.getElementById('lat').value = p.coords.latitude.toFixed(7);
+      document.getElementById('lng').value = p.coords.longitude.toFixed(7);
+    });
+  }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+{% load i18n humanize %}
+{% block title %}Analytics{% endblock %}
+{% block page_title %}Analytics & Estatísticas{% endblock %}
+{% block page_subtitle %}Análise de dados do sistema SocorroAO{% endblock %}
+
+{% block content %}
+<!-- KPI Summary -->
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:28px;">
+  <div class="stat-card s-red" style="padding:18px;">
+    <div class="stat-num" style="color:var(--accent);font-size:30px;">{{ totais.total_incidentes }}</div>
+    <div class="stat-label">Total Incidentes</div>
+    <div style="margin-top:8px;font-size:12px;color:var(--green);">✅ {{ totais.total_resolvidos }} resolvidos</div>
+  </div>
+  <div class="stat-card s-gold" style="padding:18px;">
+    <div class="stat-num" style="color:var(--gold);font-size:30px;">{{ totais.total_afetados|intcomma }}</div>
+    <div class="stat-label">Total Afectados</div>
+  </div>
+  <div class="stat-card s-green" style="padding:18px;">
+    <div class="stat-num" style="color:var(--text);font-size:30px;">{{ totais.total_voluntarios }}</div>
+    <div class="stat-label">Voluntários</div>
+    <div style="margin-top:8px;font-size:12px;color:var(--blue);">✓ {{ totais.total_verificados }} verificados</div>
+  </div>
+  <div class="stat-card s-blue" style="padding:18px;">
+    <div class="stat-num" style="color:var(--blue);font-size:30px;">{{ totais.total_missoes }}</div>
+    <div class="stat-label">Missões Completadas</div>
+  </div>
+  <div class="stat-card s-green" style="padding:18px;">
+    <div class="stat-num" style="color:var(--green);font-size:30px;">{{ totais.total_doacoes }}</div>
+    <div class="stat-label">Doações Registadas</div>
+  </div>
+  <div class="stat-card s-blue" style="padding:18px;">
+    <div class="stat-num" style="color:var(--text);font-size:30px;">{{ totais.total_centrais }}</div>
+    <div class="stat-label">Centrais de Doação</div>
+  </div>
+</div>
+
+<!-- Row 1: Evolução 30 dias + Por Tipo -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;">
+
+  <!-- Evolução 30 dias -->
+  <div class="card" style="overflow:hidden;">
+    <div style="padding:16px 22px;border-bottom:1px solid var(--border);">
+      <h3 style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">📈 Incidentes nos Últimos 30 Dias</h3>
+    </div>
+    <div style="padding:20px;">
+      <canvas id="chartEvolucao" height="180"></canvas>
+    </div>
+  </div>
+
+  <!-- Por Tipo -->
+  <div class="card" style="overflow:hidden;">
+    <div style="padding:16px 22px;border-bottom:1px solid var(--border);">
+      <h3 style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">🗂️ Incidentes por Tipo</h3>
+    </div>
+    <div style="padding:20px;display:flex;align-items:center;gap:24px;">
+      <div style="flex-shrink:0;"><canvas id="chartTipo" width="180" height="180"></canvas></div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
+        {% for item in por_tipo %}
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:10px;height:10px;border-radius:50%;background:hsl({{ forloop.counter0|add:0 }}0, 60%, 55%);flex-shrink:0;"></div>
+          <div style="flex:1;font-size:12.5px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ item.tipo|capfirst }}</div>
+          <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text);">{{ item.total }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Row 2: Por Província + Por Severidade -->
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:18px;">
+
+  <!-- Por Província -->
+  <div class="card" style="overflow:hidden;">
+    <div style="padding:16px 22px;border-bottom:1px solid var(--border);">
+      <h3 style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">🗺️ Incidentes por Província (Top 10)</h3>
+    </div>
+    <div style="padding:20px;">
+      <canvas id="chartProv" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- Por Severidade + Status -->
+  <div style="display:flex;flex-direction:column;gap:18px;">
+    <div class="card" style="overflow:hidden;flex:1;">
+      <div style="padding:14px 20px;border-bottom:1px solid var(--border);">
+        <h3 style="font-family:'Syne',sans-serif;font-size:13.5px;font-weight:700;">⚠️ Por Severidade</h3>
+      </div>
+      <div style="padding:16px 20px;display:flex;flex-direction:column;gap:10px;">
+        {% for item in por_sev %}
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+            <span class="badge badge-{{ item.severidade }}" style="font-size:10.5px;">{{ item.severidade|capfirst }}</span>
+            <span style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);">{{ item.total }}</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:{% widthratio item.total totais.total_incidentes 100 %}%;background:{% if item.severidade == 'critico' %}var(--accent){% elif item.severidade == 'medio' %}var(--gold){% else %}var(--green){% endif %};"></div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="card" style="overflow:hidden;flex:1;">
+      <div style="padding:14px 20px;border-bottom:1px solid var(--border);">
+        <h3 style="font-family:'Syne',sans-serif;font-size:13.5px;font-weight:700;">🔄 Por Estado</h3>
+      </div>
+      <div style="padding:16px 20px;display:flex;flex-direction:column;gap:10px;">
+        {% for item in por_status %}
+        <div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+            <span class="badge badge-{{ item.status }}" style="font-size:10.5px;">{{ item.status|capfirst }}</span>
+            <span style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);">{{ item.total }}</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:{% widthratio item.total totais.total_incidentes 100 %}%;background:var(--blue);"></div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Row 3: Voluntários por Província + Top Habilidades -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+
+  <div class="card" style="overflow:hidden;">
+    <div style="padding:16px 22px;border-bottom:1px solid var(--border);">
+      <h3 style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">👥 Voluntários por Província</h3>
+    </div>
+    <div style="padding:14px 20px;">
+      {% for item in vol_prov %}
+      <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);">
+        <div style="width:100px;font-size:12.5px;color:var(--text2);flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ item.provincia|capfirst }}</div>
+        <div class="progress-bar" style="flex:1;">
+          <div class="progress-fill" style="width:{% widthratio item.total totais.total_voluntarios 100 %}%;background:var(--green);"></div>
+        </div>
+        <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text);width:28px;text-align:right;flex-shrink:0;">{{ item.total }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="card" style="overflow:hidden;">
+    <div style="padding:16px 22px;border-bottom:1px solid var(--border);">
+      <h3 style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">⭐ Top Habilidades</h3>
+    </div>
+    <div style="padding:14px 20px;">
+      {% for h in top_habs %}
+      <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);">
+        <span style="font-size:18px;flex-shrink:0;">{{ h.icone }}</span>
+        <div style="flex:1;font-size:13px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ h.nome }}</div>
+        <div class="progress-bar" style="width:80px;">
+          <div class="progress-fill" style="width:{% widthratio h.total_vols totais.total_voluntarios 100 %}%;background:var(--gold);"></div>
+        </div>
+        <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text);width:24px;text-align:right;flex-shrink:0;">{{ h.total_vols }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<style>
+@media(max-width:1024px){
+  [style*="grid-template-columns:1fr 1fr"],[style*="grid-template-columns:2fr 1fr"]{grid-template-columns:1fr!important;}
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const isDark = document.documentElement.classList.contains('dark');
+const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+const labelColor = isDark ? 'rgba(240,237,232,0.5)' : 'rgba(26,23,20,0.5)';
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.color = labelColor;
+
+// ── Evolução 30 dias ──────────────────────────────────────────────────
+const evolData = {{ evolucao_json|safe }};
+new Chart(document.getElementById('chartEvolucao'), {
+  type: 'line',
+  data: {
+    labels: evolData.map(d => d.dia),
+    datasets: [{
+      label: 'Incidentes',
+      data: evolData.map(d => d.total),
+      borderColor: '#C8401A',
+      backgroundColor: 'rgba(200,64,26,0.08)',
+      borderWidth: 2.5,
+      pointRadius: 3,
+      pointBackgroundColor: '#C8401A',
+      fill: true,
+      tension: 0.4,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: gridColor }, ticks: { maxTicksLimit: 10, color: labelColor } },
+      y: { grid: { color: gridColor }, beginAtZero: true, ticks: { stepSize: 1, color: labelColor } }
+    }
+  }
+});
+
+// ── Por Tipo doughnut ─────────────────────────────────────────────────
+const tipoData = {{ por_tipo_json|safe }};
+const tipoColors = ['#C8401A','#D4A843','#2E7D52','#1A5C8A','#8B4513','#9A8F82','#4A90D9','#E85C35'];
+new Chart(document.getElementById('chartTipo'), {
+  type: 'doughnut',
+  data: {
+    labels: tipoData.map(d => d.tipo),
+    datasets: [{
+      data: tipoData.map(d => d.total),
+      backgroundColor: tipoColors,
+      borderColor: isDark ? '#1C1916' : '#FFFFFF',
+      borderWidth: 2,
+    }]
+  },
+  options: {
+    responsive: false,
+    cutout: '68%',
+    plugins: { legend: { display: false } }
+  }
+});
+
+// ── Por Província bar chart ───────────────────────────────────────────
+const provData = {{ por_prov_json|safe }};
+new Chart(document.getElementById('chartProv'), {
+  type: 'bar',
+  data: {
+    labels: provData.map(d => d.provincia),
+    datasets: [{
+      label: 'Incidentes',
+      data: provData.map(d => d.total),
+      backgroundColor: 'rgba(200,64,26,0.75)',
+      borderColor: '#C8401A',
+      borderWidth: 1,
+      borderRadius: 5,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: labelColor } },
+      y: { grid: { color: gridColor }, beginAtZero: true, ticks: { stepSize: 1, color: labelColor } }
+    }
+  }
+});
+</script>
+{% endblock %}

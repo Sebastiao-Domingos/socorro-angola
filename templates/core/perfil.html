@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% load i18n humanize %}
+{% block title %}Meu Perfil{% endblock %}
+{% block page_title %}Meu Perfil{% endblock %}
+{% block page_subtitle %}Gerir conta e preferências{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'dashboard' %}" class="btn btn-ghost btn-sm">← Dashboard</a>
+{% endblock %}
+
+{% block content %}
+<div style="display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:start;max-width:1000px;">
+
+  <!-- LEFT: Avatar & info card -->
+  <div style="display:flex;flex-direction:column;gap:16px;">
+    <div class="card" style="padding:28px;text-align:center;">
+      <div class="avatar avatar-xl" style="background:var(--accent);color:white;margin:0 auto 16px;font-size:32px;">
+        {{ user.username|first|upper }}
+      </div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px;">
+        {{ user.get_full_name|default:user.username }}
+      </h2>
+      <p style="font-size:13px;color:var(--text3);margin-bottom:16px;">@{{ user.username }}</p>
+      {% if user.is_superuser %}
+      <span class="badge" style="background:rgba(200,64,26,0.12);color:var(--accent);border:1px solid rgba(200,64,26,0.25);">🔑 Superadmin</span>
+      {% elif user.is_staff %}
+      <span class="badge" style="background:rgba(26,92,138,0.12);color:var(--blue);border:1px solid rgba(26,92,138,0.25);">⚙️ Staff</span>
+      {% else %}
+      <span class="badge badge-disponivel">Coordenador</span>
+      {% endif %}
+
+      <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:center;">
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--accent);">{{ incidentes_reportados.count }}</div>
+          <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;">Incidentes</div>
+        </div>
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--blue);">{{ user.date_joined|timesince }}</div>
+          <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;">No sistema</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:18px;">
+      <h3 style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text);">Informações da Conta</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:8px;font-size:13px;color:var(--text2);">
+          <span style="color:var(--text3);width:18px;">✉️</span>
+          <span>{{ user.email|default:"—" }}</span>
+        </div>
+        <div style="display:flex;gap:8px;font-size:13px;color:var(--text2);">
+          <span style="color:var(--text3);width:18px;">📅</span>
+          <span>Desde {{ user.date_joined|date:"d/m/Y" }}</span>
+        </div>
+        <div style="display:flex;gap:8px;font-size:13px;color:var(--text2);">
+          <span style="color:var(--text3);width:18px;">🕐</span>
+          <span>Último acesso {{ user.last_login|date:"d/m H:i" }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Edit forms -->
+  <div style="display:flex;flex-direction:column;gap:18px;">
+
+    <!-- Edit profile form -->
+    <div class="card" style="overflow:hidden;">
+      <div style="padding:16px 22px;border-bottom:1px solid var(--border);background:var(--surface2);">
+        <h2 style="font-family:'Syne',sans-serif;font-size:14.5px;font-weight:700;">✏️ Editar Dados Pessoais</h2>
+      </div>
+      <form method="post" style="padding:22px;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="profile">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="form-group" style="margin:0;">
+            <label class="form-label">Primeiro Nome</label>
+            <input type="text" name="first_name" class="form-input" value="{{ user.first_name }}" placeholder="Primeiro nome">
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label class="form-label">Apelido</label>
+            <input type="text" name="last_name" class="form-input" value="{{ user.last_name }}" placeholder="Apelido">
+          </div>
+          <div class="form-group" style="grid-column:1/-1;margin:0;">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-input" value="{{ user.email }}" placeholder="email@exemplo.ao">
+          </div>
+        </div>
+        <div style="margin-top:18px;display:flex;justify-content:flex-end;">
+          <button type="submit" class="btn btn-primary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Guardar Alterações
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Change password form -->
+    <div class="card" style="overflow:hidden;">
+      <div style="padding:16px 22px;border-bottom:1px solid var(--border);background:var(--surface2);">
+        <h2 style="font-family:'Syne',sans-serif;font-size:14.5px;font-weight:700;">🔑 Alterar Palavra-Passe</h2>
+      </div>
+      <form method="post" style="padding:22px;">
+        {% csrf_token %}
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+          <div class="form-group" style="margin:0;">
+            <label class="form-label">Palavra-passe actual</label>
+            <input type="password" name="old_password" class="form-input" placeholder="••••••••" autocomplete="current-password">
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label class="form-label">Nova palavra-passe</label>
+            <input type="password" name="new_password" id="newPw" class="form-input" placeholder="••••••••" autocomplete="new-password">
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label class="form-label">Confirmar</label>
+            <input type="password" name="confirm_password" id="confPw" class="form-input" placeholder="••••••••" autocomplete="new-password">
+          </div>
+        </div>
+        <div style="margin-top:6px;font-size:12px;color:var(--text3);">Mínimo 8 caracteres. Use letras, números e símbolos para maior segurança.</div>
+        <div style="margin-top:16px;display:flex;justify-content:flex-end;">
+          <button type="submit" class="btn btn-secondary" onclick="return checkPw()">
+            🔑 Alterar Palavra-Passe
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Incidentes reportados -->
+    <div class="card" style="overflow:hidden;">
+      <div style="padding:15px 22px;border-bottom:1px solid var(--border);">
+        <h3 style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">🚨 Incidentes que Reportei</h3>
+      </div>
+      {% if incidentes_reportados %}
+      <table class="data-table">
+        <thead><tr><th>Incidente</th><th>Severidade</th><th>Estado</th><th>Data</th></tr></thead>
+        <tbody>
+          {% for inc in incidentes_reportados %}
+          <tr>
+            <td>
+              <a href="{% url 'incidentes_detalhe' inc.pk %}" style="font-weight:600;color:var(--text);text-decoration:none;font-size:13px;">
+                {{ inc.get_tipo_emoji }} {{ inc.titulo|truncatechars:45 }}
+              </a>
+            </td>
+            <td><span class="badge badge-{{ inc.severidade }}">{{ inc.get_severidade_display }}</span></td>
+            <td><span class="badge badge-{{ inc.status }}">{{ inc.get_status_display }}</span></td>
+            <td style="font-size:12px;color:var(--text3);">{{ inc.data_inicio|date:"d/m/Y" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state" style="padding:36px;">
+        <div class="empty-state-icon" style="font-size:36px;">🚨</div>
+        <div class="empty-state-title">Nenhum incidente reportado ainda</div>
+        <a href="{% url 'incidentes_novo' %}" class="btn btn-primary" style="margin-top:12px;">Reportar Incidente</a>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<script>
+function checkPw() {
+  const pw = document.getElementById('newPw').value;
+  const cf = document.getElementById('confPw').value;
+  if (pw && cf && pw !== cf) {
+    alert('As palavras-passe não coincidem!');
+    return false;
+  }
+  if (pw && pw.length < 8) {
+    alert('A palavra-passe deve ter pelo menos 8 caracteres.');
+    return false;
+  }
+  return true;
+}
+</script>
+
+<style>
+@media(max-width:900px){[style*="grid-template-columns:300px"]{grid-template-columns:1fr!important}}
+@media(max-width:640px){[style*="grid-template-columns:1fr 1fr 1fr"]{grid-template-columns:1fr!important}}
+</style>
+{% endblock %}
