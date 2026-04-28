@@ -216,6 +216,21 @@
       <span class="theme-icon-dark">🌙</span>
     </button>
 
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+     LOADING OVERLAY
+     ═══════════════════════════════════════════════════════════════════ -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner-wrapper">
+            <div class="loading-spinner">
+                <div class="loading-spinner-ring"></div>
+                <div class="loading-spinner-icon">🆘</div>
+            </div>
+            <div class="loading-text" id="loadingText">A processar...</div>
+            <div class="loading-subtext" id="loadingSubtext">Por favor aguarde</div>
+        </div>
+    </div>
+
     <script>
       // ── Função de toggle de tema (GLOBAL) ────────────────────────────
       function toggleTheme() {
@@ -317,6 +332,98 @@
             setTimeout(() => t.remove(), 300); 
           }, 5000 + i * 500);
         });
+      });
+
+      // ── Loading overlay functions ────────────────────────────────────
+      function showLoading(text, subtext) {
+          const overlay = document.getElementById('loadingOverlay');
+          const loadingText = document.getElementById('loadingText');
+          const loadingSubtext = document.getElementById('loadingSubtext');
+          
+          if (loadingText) loadingText.textContent = text || 'A processar...';
+          if (loadingSubtext) loadingSubtext.textContent = subtext || 'Por favor aguarde';
+          if (overlay) overlay.classList.add('active');
+      }
+
+      function hideLoading() {
+          const overlay = document.getElementById('loadingOverlay');
+          if (overlay) {
+              overlay.classList.remove('active');
+          }
+      }
+
+      // ── Auto-detect form submissions ─────────────────────────────────
+      document.addEventListener('DOMContentLoaded', function() {
+          // Intercepta todos os formulários
+          document.querySelectorAll('form').forEach(form => {
+              form.addEventListener('submit', function(e) {
+                  // Não mostra loading em formulários de busca/filtro (GET)
+                  if (form.method.toUpperCase() === 'GET') return;
+                  
+                  // Verifica se o formulário é válido (HTML5 validation)
+                  if (form.checkValidity && !form.checkValidity()) return;
+                  
+                  // Texto personalizado baseado no formulário
+                  let text = 'A enviar...';
+                  let subtext = 'Por favor aguarde';
+                  
+                  // Detecta tipo de formulário
+                  const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+                  if (submitBtn) {
+                      const btnText = submitBtn.textContent || submitBtn.value || '';
+                      if (btnText.includes('Guardar') || btnText.includes('Salvar')) {
+                          text = 'A guardar...';
+                          subtext = 'Os dados estão a ser processados';
+                      } else if (btnText.includes('Eliminar') || btnText.includes('Apagar') || btnText.includes('Remover')) {
+                          text = 'A eliminar...';
+                          subtext = 'Esta operação não pode ser desfeita';
+                      } else if (btnText.includes('Entrar') || btnText.includes('Login')) {
+                          text = 'A autenticar...';
+                          subtext = 'A verificar as suas credenciais';
+                      } else if (btnText.includes('Registar') || btnText.includes('Cadastrar') || btnText.includes('Voluntário')) {
+                          text = 'A registar...';
+                          subtext = 'Bem-vindo à equipa!';
+                      } else if (btnText.includes('Enviar') || btnText.includes('Reportar') || btnText.includes('Emergência')) {
+                          text = 'A enviar reporte...';
+                          subtext = 'Os coordenadores serão notificados';
+                      } else if (btnText.includes('Atualizar') || btnText.includes('Actualizar')) {
+                          text = 'A atualizar...';
+                          subtext = 'Os dados estão a ser processados';
+                      }
+                  }
+                  
+                  showLoading(text, subtext);
+                  
+                  // Desabilita o botão de submit
+                  if (submitBtn) {
+                      submitBtn.disabled = true;
+                      submitBtn.dataset.originalText = submitBtn.textContent || submitBtn.value;
+                  }
+              });
+          });
+          
+          // Intercepta links com data-loading
+          document.querySelectorAll('[data-loading]').forEach(link => {
+              link.addEventListener('click', function(e) {
+                  const text = this.dataset.loading || 'A carregar...';
+                  const subtext = this.dataset.loadingSubtext || 'Por favor aguarde';
+                  showLoading(text, subtext);
+              });
+          });
+      });
+
+      // ── Hide loading on page load complete ───────────────────────────
+      window.addEventListener('pageshow', function(event) {
+          // Se a página foi carregada do cache (back button), esconde o loading
+          if (event.persisted) {
+              hideLoading();
+          }
+      });
+
+      // ── Hide loading on navigation ───────────────────────────────────
+      window.addEventListener('beforeunload', function() {
+          // Não mostra loading se o usuário está a sair da página
+          // (o loading já será mostrado pelo próximo formulário)
       });
     </script>
     

@@ -1,93 +1,604 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
 {% block public_content %}
-    <div style="min-height:100vh;background:var(--nav-bg);display:flex;position:relative;overflow:hidden;">
-    <!-- Background pattern -->
-    <div style="position:absolute;inset:0;background-image:radial-gradient(rgba(200,64,26,0.05) 1px,transparent 1px);background-size:28px 28px;"></div>
-    <div style="position:absolute;top:-150px;right:-150px;width:500px;height:500px;background:radial-gradient(circle,rgba(200,64,26,0.1),transparent 70%);"></div>
+<div class="login-page">
+    <!-- Background decorations -->
+    <div class="login-bg-pattern"></div>
+    <div class="login-bg-glow login-bg-glow-top"></div>
+    <div class="login-bg-glow login-bg-glow-bottom"></div>
 
-    <!-- Left branding -->
-    <div style="flex:1;display:none;flex-direction:column;justify-content:center;padding:80px;position:relative;z-index:1;" class="login-left">
-        <div style="margin-bottom:48px;">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:36px;">
-            <div style="width:44px;height:44px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;">🆘</div>
-            <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:#fff;">Socorro<span style="color:var(--accent2);">AO</span></div>
-        </div>
-        <h1 style="font-family:'Syne',sans-serif;font-size:44px;font-weight:800;color:#fff;line-height:1.1;margin-bottom:16px;">A plataforma<br>de coordenação<br><span style="color:var(--accent);">de desastres</span></h1>
-        <p style="font-size:16px;color:rgba(240,237,232,0.5);line-height:1.7;max-width:380px;">Sistema nacional para gestão de voluntários, incidentes e doações em emergências humanitárias em Angola.</p>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:16px;">
-        {% for item in bancos %}{% endfor %}
-        {% for text in bancos_textos%}
-            <div style="display:flex;align-items:center;gap:10px;">
-                <div style="width:24px;height:24px;background:rgba(46,125,82,0.2);border:1px solid rgba(46,125,82,0.4);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+    <div class="login-container">
+        <!-- Left branding panel (always dark) -->
+        <div class="login-left">
+            <div class="login-left-inner">
+                <div class="login-left-logo">
+                    <div class="login-left-logo-icon">🆘</div>
+                    <div class="login-left-logo-text">Socorro<span>AO</span></div>
                 </div>
-                <span style="font-size:14px;color:rgba(240,237,232,0.6);">{{ text }}</span>
-            </div>
-        {% endfor %}
-        </div>
-    </div>
 
-    <!-- Right: Login form -->
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:40px 24px;position:relative;z-index:1;">
-        <div style="width:100%;max-width:400px;">
-        <!-- Logo mobile -->
-        <div style="text-align:center;margin-bottom:36px;">
-            <div style="width:52px;height:52px;background:var(--accent);border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:14px;">🆘</div>
-            <h2 style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#fff;">Bem-vindo de volta</h2>
-            <p style="font-size:14px;color:rgba(240,237,232,0.4);margin-top:6px;">Aceda ao painel de coordenação</p>
-        </div>
+                <h1 class="login-left-headline">
+                    A plataforma<br>
+                    de coordenação<br>
+                    <span class="login-left-accent">de desastres</span>
+                </h1>
+                <p class="login-left-desc">
+                    Sistema nacional para gestão de voluntários, incidentes e doações em emergências humanitárias em Angola.
+                </p>
 
-        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:32px;">
-            {% if messages %}
-            {% for message in messages %}
-            <div style="background:rgba(200,64,26,0.15);border:1px solid rgba(200,64,26,0.3);border-radius:8px;padding:11px 14px;margin-bottom:20px;font-size:13.5px;color:var(--accent2);display:flex;align-items:center;gap:8px;">
-            ⚠️ {{ message }}
-            </div>
-            {% endfor %}
-            {% endif %}
-
-            <form method="post" action="{% url 'login' %}">
-            {% csrf_token %}
-            <div class="form-group">
-                <label class="form-label" style="color:rgba(240,237,232,0.5);">Utilizador</label>
-                <input type="text" name="username" class="form-input" placeholder="O seu username" required autofocus
-                style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#fff;">
-            </div>
-            <div class="form-group">
-                <label class="form-label" style="color:rgba(240,237,232,0.5);">Palavra-Passe</label>
-                <div style="position:relative;">
-                <input type="password" name="password" id="pwdInput" class="form-input" placeholder="••••••••" required
-                    style="background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#fff;">
-                <button type="button" onclick="togglePwd()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:rgba(240,237,232,0.4);font-size:16px;">👁️</button>
+                <div class="login-features">
+                    <div class="login-feature-item">
+                        <div class="login-feature-check">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </div>
+                        <span>Coordenação de voluntários em tempo real</span>
+                    </div>
+                    <div class="login-feature-item">
+                        <div class="login-feature-check">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </div>
+                        <span>Mapa interactivo de incidentes</span>
+                    </div>
+                    <div class="login-feature-item">
+                        <div class="login-feature-check">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </div>
+                        <span>Gestão de centrais de doação</span>
+                    </div>
+                    <div class="login-feature-item">
+                        <div class="login-feature-check">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                        </div>
+                        <span>Relatórios e analytics completos</span>
+                    </div>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:15px;margin-top:8px;">
-                Entrar no Sistema
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </button>
-            </form>
+        </div>
 
-            <div style="text-align:center;margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.06);">
-            <p style="font-size:12.5px;color:rgba(240,237,232,0.3);">Não tem acesso? Contacte o administrador do sistema.</p>
+        <!-- Right: Login form -->
+        <div class="login-right">
+            <div class="login-form-wrapper">
+                <!-- Logo mobile -->
+                <div class="login-mobile-header">
+                    <div class="login-mobile-logo">🆘</div>
+                    <h2 class="login-mobile-title">Bem-vindo de volta</h2>
+                    <p class="login-mobile-subtitle">Aceda ao painel de coordenação</p>
+                </div>
+
+                <!-- Messages -->
+                {% if messages %}
+                <div class="login-messages">
+                    {% for message in messages %}
+                    <div class="login-message {% if message.tags == 'error' %}login-message-error{% else %}login-message-info{% endif %}">
+                        <span class="login-message-icon">
+                            {% if message.tags == 'error' %}⚠️{% else %}ℹ️{% endif %}
+                        </span>
+                        <span>{{ message }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Form card -->
+                <div class="login-card">
+                    <form method="post" action="{% url 'login' %}" autocomplete="on">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="username">Utilizador</label>
+                            <div class="login-input-wrapper">
+                                <span class="login-input-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                                        <circle cx="12" cy="7" r="4"/>
+                                    </svg>
+                                </span>
+                                <input type="text" name="username" id="username" class="form-input login-input" 
+                                    placeholder="O seu username" required autofocus autocomplete="username">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="password">Palavra-Passe</label>
+                            <div class="login-input-wrapper">
+                                <span class="login-input-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                        <path d="M7 11V7a5 5 0 0110 0v4"/>
+                                    </svg>
+                                </span>
+                                <input type="password" name="password" id="password" class="form-input login-input" 
+                                    placeholder="••••••••" required autocomplete="current-password">
+                                <button type="button" onclick="togglePassword()" class="login-pwd-toggle" aria-label="Mostrar/Esconder palavra-passe" tabindex="-1">
+                                    <span id="pwdIcon">👁️</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="login-submit-btn">
+                            <span>Entrar no Sistema</span>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                                <polyline points="12 5 19 12 12 19"/>
+                            </svg>
+                        </button>
+                    </form>
+
+                    <div class="login-card-footer">
+                        <p>Não tem acesso? Contacte o administrador do sistema.</p>
+                    </div>
+                </div>
+
+                <div class="login-back-link">
+                    <a href="{% url 'home' %}">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="19" y1="12" x2="5" y2="12"/>
+                            <polyline points="12 19 5 12 12 5"/>
+                        </svg>
+                        Voltar à página inicial
+                    </a>
+                </div>
             </div>
         </div>
+    </div>
+</div>
 
-        <div style="text-align:center;margin-top:20px;">
-            <a href="{% url 'home' %}" style="font-size:13px;color:rgba(240,237,232,0.35);text-decoration:none;">← Voltar à página inicial</a>
-        </div>
-        </div>
-    </div>
-    </div>
-    <script>
-    function togglePwd() {
-        const i = document.getElementById('pwdInput');
-        i.type = i.type === 'password' ? 'text' : 'password';
+<style>
+/* ═══════════════════════════════════════════════════════════════════
+   LOGIN PAGE STYLES
+   Usa as variáveis CSS da base.css
+   ═══════════════════════════════════════════════════════════════════ */
+
+.login-page {
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: var(--bg);
+    display: flex;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-bg-pattern {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(200,64,26,0.04) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
+}
+
+.dark .login-bg-pattern {
+    background-image: radial-gradient(rgba(200,64,26,0.06) 1px, transparent 1px);
+}
+
+.login-bg-glow {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.login-bg-glow-top {
+    top: -150px;
+    right: -150px;
+    background: radial-gradient(circle, rgba(200,64,26,0.06), transparent 70%);
+}
+
+.login-bg-glow-bottom {
+    bottom: -150px;
+    left: -150px;
+    background: radial-gradient(circle, rgba(46,125,82,0.04), transparent 70%);
+}
+
+.dark .login-bg-glow-top {
+    background: radial-gradient(circle, rgba(200,64,26,0.12), transparent 70%);
+}
+
+.dark .login-bg-glow-bottom {
+    background: radial-gradient(circle, rgba(46,125,82,0.06), transparent 70%);
+}
+
+.login-container {
+    display: flex;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+}
+
+/* ── Left Panel (always dark for branding) ── */
+.login-left {
+    display: none;
+    flex: 1;
+    background: #130F0D;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-left::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 70%);
+}
+
+.login-left-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 440px;
+}
+
+.login-left-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 40px;
+}
+
+.login-left-logo-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--accent);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.login-left-logo-text {
+    font-weight: 800;
+    font-size: 22px;
+    color: #fff;
+}
+
+.login-left-logo-text span {
+    color: var(--accent2);
+}
+
+.login-left-headline {
+    font-size: clamp(32px, 4vw, 48px);
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
+}
+
+.login-left-accent {
+    color: var(--accent);
+    position: relative;
+}
+
+.login-left-accent::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--accent);
+    border-radius: 2px;
+    opacity: 0.4;
+}
+
+.login-left-desc {
+    font-size: 15px;
+    color: rgba(240,237,232,0.55);
+    line-height: 1.7;
+    margin-bottom: 40px;
+    max-width: 380px;
+}
+
+.login-features {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.login-feature-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: rgba(240,237,232,0.6);
+}
+
+.login-feature-check {
+    width: 26px;
+    height: 26px;
+    background: rgba(46,125,82,0.2);
+    border: 1px solid rgba(46,125,82,0.4);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--green);
+}
+
+/* ── Right Panel ── */
+.login-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+}
+
+.login-form-wrapper {
+    width: 100%;
+    max-width: 420px;
+}
+
+.login-mobile-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.login-mobile-logo {
+    width: 56px;
+    height: 56px;
+    background: var(--accent);
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-bottom: 16px;
+    box-shadow: 0 0 20px rgba(200,64,26,0.3);
+}
+
+.login-mobile-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 6px;
+}
+
+.login-mobile-subtitle {
+    font-size: 14px;
+    color: var(--text3);
+}
+
+.login-messages {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.login-message {
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: slideDown 0.3s ease;
+}
+
+.login-message-error {
+    background: var(--accent-light);
+    border: 1px solid rgba(200,64,26,0.3);
+    color: var(--accent);
+}
+
+.login-message-info {
+    background: var(--blue-light);
+    border: 1px solid rgba(26,92,138,0.3);
+    color: var(--blue);
+}
+
+.login-message-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-8px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    box-shadow: var(--shadow);
+}
+
+.dark .login-card {
+    background: rgba(255,255,255,0.03);
+    border-color: rgba(255,255,255,0.08);
+}
+
+.login-input-wrapper {
+    position: relative;
+}
+
+.login-input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text3);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    z-index: 1;
+}
+
+.login-input {
+    padding-left: 42px !important;
+    padding-right: 44px !important;
+    min-height: 50px !important;
+}
+
+.login-pwd-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text3);
+    font-size: 18px;
+    padding: 6px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    min-width: 36px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+.login-pwd-toggle:hover {
+    background: var(--surface2);
+    color: var(--text);
+}
+
+.login-submit-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 20px;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.25s;
+    box-shadow: 0 4px 18px rgba(200,64,26,0.3);
+    min-height: 52px;
+    margin-top: 12px;
+}
+
+.login-submit-btn:hover {
+    background: var(--accent2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(200,64,26,0.4);
+}
+
+.login-submit-btn:active {
+    transform: scale(0.98);
+}
+
+.login-card-footer {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.login-card-footer p {
+    font-size: 12.5px;
+    color: var(--text3);
+}
+
+.login-back-link {
+    text-align: center;
+    margin-top: 24px;
+}
+
+.login-back-link a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text3);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+    padding: 8px 16px;
+    border-radius: 8px;
+}
+
+.login-back-link a:hover {
+    color: var(--text);
+    background: var(--surface2);
+}
+
+/* ── Responsive ── */
+@media (min-width: 900px) {
+    .login-left {
+        display: flex;
+    }
+}
+
+@media (max-width: 899px) {
+    .login-right {
+        padding: 32px 20px;
+    }
+    
+    .login-card {
+        padding: 24px 20px;
+    }
+    
+    .login-mobile-header {
+        margin-bottom: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-right {
+        padding: 20px 12px;
+    }
+    
+    .login-card {
+        padding: 20px 16px;
+        border-radius: 14px;
+    }
+    
+    .login-mobile-logo {
+        width: 48px;
+        height: 48px;
+        font-size: 24px;
+    }
+    
+    .login-mobile-title {
+        font-size: 22px;
+    }
+    
+    .login-submit-btn {
+        font-size: 14px;
+        padding: 12px 16px;
+    }
+}
+</style>
+
+<script>
+    function togglePassword() {
+        const input = document.getElementById('password');
+        const icon = document.getElementById('pwdIcon');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.textContent = '🙈';
+        } else {
+            input.type = 'password';
+            icon.textContent = '👁️';
         }
-    </script>
-    <style>
-        @media(min-width:900px) { .login-left { display:flex !important; } }
-    </style>
+    }
+</script>
 {% endblock %}

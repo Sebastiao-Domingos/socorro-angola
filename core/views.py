@@ -104,7 +104,7 @@ def login_view(request):
     ]
 
     bancos_textos = [
-        "Mapa de incidentes em tempo rea",
+        "Mapa de incidentes em tempo real",
         "Banco de voluntários georreferenciado",
         "Gestão de centrais de doação",
         "Relatórios de intervenção"
