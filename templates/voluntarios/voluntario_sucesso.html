@@ -1,0 +1,212 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="theme-color" content="#2E7D52">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="description" content="Registo de voluntário concluído com sucesso — SocorroAO">
+    <title>💚 Registo Concluído — SocorroAO</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{% static 'css/voluntario/voluntario_sucesso.css' %}">
+</head>
+<body>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         BACKGROUND DECORATION
+         ═══════════════════════════════════════════════════════════════════ -->
+    <div class="bg-decoration c1"></div>
+    <div class="bg-decoration c2"></div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         CONFETTI ANIMATION
+         ═══════════════════════════════════════════════════════════════════ -->
+    <div class="confetti-container" id="confettiContainer"></div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         CARD
+         ═══════════════════════════════════════════════════════════════════ -->
+    <div class="card">
+        <!-- Badge -->
+        <div class="badge">
+            <div class="badge-dot"></div>
+            Voluntário Registado
+        </div>
+
+        <!-- Check circle with pulse rings -->
+        <div class="check-circle-wrapper">
+            <div class="check-pulse"></div>
+            <div class="check-pulse"></div>
+            <div class="check-pulse"></div>
+            <div class="check-circle" aria-hidden="true">💚</div>
+        </div>
+
+        <h1>Bem-vindo à Equipa!</h1>
+        <p class="subtitle">
+            O seu registo como voluntário foi concluído com <span class="highlight">sucesso</span>. 
+            Está agora oficialmente pronto para ajudar a salvar vidas em Angola.
+        </p>
+
+        <!-- Tip card -->
+        <div class="tip-card">
+            <div class="tip-icon">📱</div>
+            <div class="tip-text">
+                <strong>Fique atento ao seu telefone!</strong><br>
+                Irá receber um SMS de confirmação e, quando houver uma emergência perto de si, 
+                será notificado para entrar em acção.
+            </div>
+        </div>
+
+        <!-- Next steps -->
+        <div class="steps">
+            <div class="steps-title">O que acontece agora</div>
+            <div class="step-row">
+                <div class="step-icon">📋</div>
+                <div class="step-content">
+                    <div class="step-text"><strong>Perfil verificado</strong> — A nossa equipa irá rever o seu cadastro e validar as informações.</div>
+                    <div class="step-time">⏱️ Próximas 24 horas</div>
+                </div>
+            </div>
+            <div class="step-row">
+                <div class="step-icon">🔔</div>
+                <div class="step-content">
+                    <div class="step-text"><strong>Alertas activados</strong> — Vai receber notificações de incidentes na sua zona de actuação.</div>
+                    <div class="step-time">⏱️ Após verificação</div>
+                </div>
+            </div>
+            <div class="step-row">
+                <div class="step-icon">🤝</div>
+                <div class="step-content">
+                    <div class="step-text"><strong>Primeira missão</strong> — Será contactado quando houver uma emergência que corresponda às suas habilidades.</div>
+                    <div class="step-time">⏱️ Em breve</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <a href="{% url 'home' %}" class="btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            Voltar à Página Inicial
+        </a>
+        <a href="{% url 'reportar_publico' %}" class="btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            Reportar uma Emergência
+        </a>
+
+        <div class="footer-text">
+            🇦🇴 SocorroAO · Obrigado por se juntar à causa <span class="heart">💚</span>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         FLOATING THEME TOGGLE
+         ═══════════════════════════════════════════════════════════════════ -->
+    <button id="floatingThemeBtn" class="floating-theme-btn" title="Alternar tema claro/escuro" aria-label="Alternar tema">
+        <span class="theme-icon-light">☀️</span>
+        <span class="theme-icon-dark">🌙</span>
+    </button>
+
+    <script>
+        // ── Theme management ──────────────────────────────────────────
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.classList.contains('dark');
+            
+            if (isDark) {
+                html.classList.remove('dark');
+                html.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+            
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const floatingBtn = document.getElementById('floatingThemeBtn');
+            if (floatingBtn) {
+                floatingBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleTheme();
+                });
+            }
+
+            // ── Launch confetti ──────────────────────────────────────
+            createConfetti();
+        });
+
+        // ── Confetti animation ───────────────────────────────────────
+        function createConfetti() {
+            const container = document.getElementById('confettiContainer');
+            const colors = [
+                '#2E7D52', '#3DAA6F', '#4ECB7C',
+                '#D4A843', '#E4BB5C',
+                '#C8401A', '#E85C35',
+                '#1A5C8A', '#4A9AC4',
+                '#FFFFFF', '#F0EDE8'
+            ];
+            
+            const shapes = ['circle', 'square', 'strip'];
+            const fragment = document.createDocumentFragment();
+            
+            for (let i = 0; i < 70; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                const shape = shapes[Math.floor(Math.random() * shapes.length)];
+                if (shape === 'circle') {
+                    confetti.style.width = (Math.random() * 8 + 6) + 'px';
+                    confetti.style.height = confetti.style.width;
+                    confetti.style.borderRadius = '50%';
+                } else if (shape === 'strip') {
+                    confetti.style.width = (Math.random() * 6 + 3) + 'px';
+                    confetti.style.height = (Math.random() * 16 + 10) + 'px';
+                    confetti.style.borderRadius = '2px';
+                } else {
+                    confetti.style.width = (Math.random() * 10 + 6) + 'px';
+                    confetti.style.height = (Math.random() * 10 + 6) + 'px';
+                    confetti.style.borderRadius = '3px';
+                }
+                
+                confetti.style.animationDuration = (Math.random() * 3 + 2.5) + 's';
+                confetti.style.animationDelay = (Math.random() * 2) + 's';
+                fragment.appendChild(confetti);
+            }
+            
+            container.appendChild(fragment);
+            
+            // Clean up after animation
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 6000);
+        }
+    </script>
+</body>
+</html>
