@@ -3,15 +3,17 @@
 <html lang="{% get_current_language as LANGUAGE_CODE %}{{ LANGUAGE_CODE }}" class="light" data-theme="light">
   <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="description" content="SocorroAO — Sistema Nacional de Coordenação de Voluntários em Desastres em Angola">
+    <meta name="theme-color" content="#C8401A">
     <title>{% block title %}SocorroAO{% endblock %} — Sistema de Coordenação de Desastres Angola</title>
 
-    <!-- Fonts -->
+    <!-- Fonts: Inter (sans-serif) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
 
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <!-- Tailwind CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -20,8 +22,8 @@
       theme: {
         extend: {
           fontFamily: {
-            syne: ['Syne', 'sans-serif'],
-            dm: ['DM Sans', 'sans-serif'],
+            sans: ['Inter', 'DM Sans', 'system-ui', '-apple-system', 'sans-serif'],
+            display: ['Inter', 'system-ui', 'sans-serif'],
           },
           colors: {
             ao: {
@@ -47,487 +49,283 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <style>
-      :root {
-        --bg: #F5F2ED; --bg2: #FFFEFB; --surface: #FFFFFF;
-        --surface2: #F0EDE8; --border: #E2DDD5;
-        --text: #1A1714; --text2: #5C544A; --text3: #9A8F82;
-        --accent: #C8401A; --accent2: #E85C35;
-        --gold: #D4A843; --green: #2E7D52; --blue: #1A5C8A;
-        --sidebar: 264px;
-        --nav-bg: #130F0D;
-        --radius: 12px;
-        --shadow: 0 2px 12px rgba(26,23,20,0.08);
-        --shadow-lg: 0 8px 32px rgba(26,23,20,0.14);
-      }
-      .dark {
-        --bg: #0F0D0B; --bg2: #141210; --surface: #1C1916;
-        --surface2: #242018; --border: #2E2920;
-        --text: #F0EDE8; --text2: #A89E93; --text3: #6B6159;
-        --accent: #E85C35; --accent2: #FF7A52;
-        --gold: #E4BB5C; --green: #3DAA6F; --blue: #4A9AC4;
-        --nav-bg: #0A0807;
-        --shadow: 0 2px 12px rgba(0,0,0,0.3);
-        --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
-      }
-
-      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-      html { scroll-behavior: smooth; }
-      body {
-        font-family: 'DM Sans', sans-serif;
-        background: var(--bg);
-        color: var(--text);
-        line-height: 1.6;
-        -webkit-font-smoothing: antialiased;
-        transition: background 0.3s, color 0.3s;
-        min-height: 100vh;
-      }
-      h1,h2,h3,h4,h5,h6 { font-family: 'Syne', sans-serif; line-height: 1.2; }
-
-      /* ── Scrollbar ── */
-      ::-webkit-scrollbar { width: 5px; height: 5px; }
-      ::-webkit-scrollbar-track { background: var(--bg); }
-      ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-      ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
-
-      /* ── Sidebar ── */
-      .sidebar {
-        position: fixed; left: 0; top: 0; height: 100vh; width: var(--sidebar);
-        background: var(--nav-bg); z-index: 200;
-        display: flex; flex-direction: column;
-        transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
-        border-right: 1px solid rgba(255,255,255,0.04);
-      }
-      .sidebar-logo-bar {
-        padding: 20px 20px 16px;
-        border-bottom: 1px solid rgba(255,255,255,0.06);
-        flex-shrink: 0;
-      }
-      .sidebar-nav { flex: 1; padding: 10px 10px; overflow-y: auto; }
-      .sidebar-footer { padding: 14px 16px; border-top: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; }
-      .main-wrap { margin-left: var(--sidebar); min-height: 100vh; display: flex; flex-direction: column; }
-
-      @media (max-width: 1024px) {
-        .sidebar { transform: translateX(-100%); }
-        .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-lg); }
-        .main-wrap { margin-left: 0; }
-      }
-
-      /* ── Nav links ── */
-      .nav-link {
-        display: flex; align-items: center; gap: 10px;
-        padding: 9px 14px; border-radius: 8px;
-        color: rgba(240,237,232,0.55);
-        text-decoration: none; font-size: 13.5px; font-weight: 500;
-        transition: all 0.18s; margin: 1px 0;
-        position: relative;
-      }
-      .nav-link:hover { background: rgba(200,64,26,0.12); color: rgba(240,237,232,0.9); }
-      .nav-link.active {
-        background: rgba(200,64,26,0.18);
-        color: #FFF;
-      }
-      .nav-link.active::before {
-        content: ''; position: absolute; left: 0; top: 20%; bottom: 20%;
-        width: 3px; background: var(--accent); border-radius: 2px;
-      }
-      .nav-section-label {
-        font-size: 9.5px; font-weight: 700; letter-spacing: 1.5px;
-        color: rgba(240,237,232,0.25); text-transform: uppercase;
-        padding: 10px 14px 5px; font-family: 'Syne', sans-serif;
-      }
-
-      /* ── Cards ── */
-      .card {
-        background: var(--surface); border: 1px solid var(--border);
-        border-radius: var(--radius); box-shadow: var(--shadow);
-        transition: border-color 0.2s, box-shadow 0.2s;
-      }
-      .card:hover { border-color: var(--accent); }
-      .card-p { padding: 20px 24px; }
-
-      /* ── Stat cards ── */
-      .stat-card {
-        background: var(--surface); border: 1px solid var(--border);
-        border-radius: 16px; padding: 22px 24px;
-        position: relative; overflow: hidden;
-        transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-      }
-      .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
-      .stat-card::after {
-        content: ''; position: absolute;
-        top: -24px; right: -24px;
-        width: 90px; height: 90px; border-radius: 50%;
-        opacity: 0.06;
-      }
-      .stat-card.s-red::after { background: var(--accent); }
-      .stat-card.s-gold::after { background: var(--gold); }
-      .stat-card.s-green::after { background: var(--green); }
-      .stat-card.s-blue::after { background: var(--blue); }
-      .stat-num { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; line-height: 1; }
-      .stat-label { font-size: 12px; color: var(--text3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 4px; }
-      .stat-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-
-      /* ── Buttons ── */
-      .btn {
-        display: inline-flex; align-items: center; gap: 7px;
-        padding: 9px 18px; border-radius: 8px;
-        font-family: 'Syne', sans-serif; font-size: 13.5px; font-weight: 600;
-        text-decoration: none; cursor: pointer; border: 1px solid transparent;
-        transition: all 0.18s; white-space: nowrap;
-      }
-      .btn-primary { background: var(--accent); color: white; }
-      .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(200,64,26,0.35); }
-      .btn-secondary { background: var(--surface2); color: var(--text); border-color: var(--border); }
-      .btn-secondary:hover { background: var(--border); }
-      .btn-ghost { background: transparent; color: var(--text2); border-color: var(--border); }
-      .btn-ghost:hover { background: var(--surface2); }
-      .btn-danger { background: #C8401A20; color: var(--accent); border-color: var(--accent); }
-      .btn-danger:hover { background: var(--accent); color: white; }
-      .btn-sm { padding: 6px 12px; font-size: 12.5px; }
-      .btn-lg { padding: 13px 28px; font-size: 15px; }
-      .btn-icon { padding: 8px; border-radius: 8px; }
-
-      /* ── Badges ── */
-      .badge {
-        display: inline-flex; align-items: center; gap: 4px;
-        padding: 3px 10px; border-radius: 100px;
-        font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
-      }
-      .badge-critico { background: rgba(200,64,26,0.15); color: var(--accent); border: 1px solid rgba(200,64,26,0.3); }
-      .badge-medio { background: rgba(212,168,67,0.15); color: var(--gold); border: 1px solid rgba(212,168,67,0.3); }
-      .badge-baixo { background: rgba(46,125,82,0.15); color: var(--green); border: 1px solid rgba(46,125,82,0.3); }
-      .badge-ativo { background: rgba(200,64,26,0.15); color: var(--accent); border: 1px solid rgba(200,64,26,0.3); }
-      .badge-em_atendimento { background: rgba(212,168,67,0.15); color: var(--gold); border: 1px solid rgba(212,168,67,0.3); }
-      .badge-monitoramento { background: rgba(26,92,138,0.15); color: var(--blue); border: 1px solid rgba(26,92,138,0.3); }
-      .badge-resolvido { background: rgba(46,125,82,0.15); color: var(--green); border: 1px solid rgba(46,125,82,0.3); }
-      .badge-disponivel { background: rgba(46,125,82,0.15); color: var(--green); border: 1px solid rgba(46,125,82,0.3); }
-      .badge-ocupado { background: rgba(212,168,67,0.15); color: var(--gold); border: 1px solid rgba(212,168,67,0.3); }
-      .badge-indisponivel { background: rgba(92,84,74,0.15); color: var(--text3); border: 1px solid var(--border); }
-
-      /* ── Forms ── */
-      .form-group { margin-bottom: 18px; }
-      .form-label { display: block; font-size: 12.5px; font-weight: 600; color: var(--text2); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-      .form-input {
-        width: 100%; background: var(--surface); color: var(--text);
-        border: 1px solid var(--border); border-radius: 8px;
-        padding: 10px 14px; font-family: 'DM Sans', sans-serif; font-size: 14px;
-        transition: border-color 0.18s, box-shadow 0.18s; outline: none;
-      }
-      .form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(200,64,26,0.1); }
-      .form-input::placeholder { color: var(--text3); }
-      textarea.form-input { resize: vertical; min-height: 80px; }
-      select.form-input { cursor: pointer; }
-
-      /* ── Topbar ── */
-      .topbar {
-        background: var(--surface); border-bottom: 1px solid var(--border);
-        padding: 12px 28px; display: flex; align-items: center;
-        justify-content: space-between; position: sticky; top: 0; z-index: 100;
-        backdrop-filter: blur(8px);
-      }
-      .main-content { padding: 28px; flex: 1; }
-
-      /* ── Table ── */
-      .data-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-      .data-table th {
-        text-align: left; padding: 11px 14px;
-        font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-        color: var(--text3); border-bottom: 1px solid var(--border); white-space: nowrap;
-        font-family: 'Syne', sans-serif;
-      }
-      .data-table td { padding: 13px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-      .data-table tr:last-child td { border-bottom: none; }
-      .data-table tbody tr { transition: background 0.15s; }
-      .data-table tbody tr:hover { background: var(--surface2); }
-
-      /* ── Progress ── */
-      .progress-bar { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
-      .progress-fill { height: 100%; border-radius: 3px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
-
-      /* ── Pulse dot ── */
-      .pulse-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
-      .pulse-dot.critico { background: var(--accent); animation: pulse-red 2s infinite; }
-      .pulse-dot.medio { background: var(--gold); animation: pulse-gold 2s infinite; }
-      .pulse-dot.baixo { background: var(--green); }
-      @keyframes pulse-red { 0%,100% { box-shadow: 0 0 0 0 rgba(200,64,26,0.4); } 50% { box-shadow: 0 0 0 5px rgba(200,64,26,0); } }
-      @keyframes pulse-gold { 0%,100% { box-shadow: 0 0 0 0 rgba(212,168,67,0.4); } 50% { box-shadow: 0 0 0 5px rgba(212,168,67,0); } }
-
-      /* ── Map ── */
-      .map-container { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
-
-      /* ── Toast / messages ── */
-      .toast-wrap { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-      .toast {
-        padding: 13px 18px; border-radius: 10px; max-width: 360px;
-        font-size: 13.5px; display: flex; align-items: flex-start; gap: 10px;
-        box-shadow: var(--shadow-lg); animation: slideInToast 0.35s ease;
-        background: var(--surface); border: 1px solid var(--border);
-      }
-      .toast.success { border-left: 4px solid var(--green); }
-      .toast.error   { border-left: 4px solid var(--accent); }
-      .toast.info    { border-left: 4px solid var(--blue); }
-      .toast.warning { border-left: 4px solid var(--gold); }
-      @keyframes slideInToast { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
-      /* ── Overlay ── */
-      .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 190; display: none; backdrop-filter: blur(2px); }
-      .overlay.open { display: block; }
-
-      /* ── Flag stripe ── */
-      .ao-flag-stripe { height: 3px; background: linear-gradient(90deg, #CC0000 50%, #000 50%); }
-
-      /* ── Avatar ── */
-      .avatar { border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 700; flex-shrink: 0; }
-      .avatar-sm { width: 32px; height: 32px; font-size: 12px; }
-      .avatar-md { width: 42px; height: 42px; font-size: 15px; }
-      .avatar-lg { width: 64px; height: 64px; font-size: 22px; }
-      .avatar-xl { width: 88px; height: 88px; font-size: 30px; }
-
-      /* ── Modal ── */
-      .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 500; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
-      .modal-backdrop.open { display: flex; }
-      .modal { background: var(--surface); border-radius: 16px; max-width: 520px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); animation: modalIn 0.25s ease; }
-      @keyframes modalIn { from { transform: scale(0.93) translateY(10px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
-      .modal-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-      .modal-body { padding: 20px 24px; }
-      .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
-
-      /* ── Page animations ── */
-      .page-enter { animation: pageEnter 0.35s ease both; }
-      @keyframes pageEnter { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-      .fade-up { animation: fadeUp 0.5s ease both; }
-      @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-      /* ── Lang btn ── */
-      .lang-btn { padding: 4px 9px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.12); background: transparent; color: rgba(240,237,232,0.5); font-size: 11px; cursor: pointer; font-family: 'Syne', sans-serif; font-weight: 700; transition: all 0.18s; letter-spacing: 0.5px; }
-      .lang-btn:hover, .lang-btn.active { background: rgba(200,64,26,0.25); color: rgba(240,237,232,0.95); border-color: rgba(200,64,26,0.5); }
-
-      /* ── Mobile menu btn ── */
-      #menuBtn { display: none; position: fixed; top: 14px; left: 14px; z-index: 300; background: var(--nav-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 9px; cursor: pointer; }
-      @media (max-width: 1024px) { #menuBtn { display: flex; } }
-
-      /* ── Checklist ── */
-      .checklist-item { display: flex; align-items: flex-start; gap: 12px; padding: 11px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); transition: all 0.2s; cursor: pointer; }
-      .checklist-item:hover { border-color: var(--accent); background: var(--surface2); }
-      .checklist-item.done { opacity: 0.55; }
-      .checklist-item.done .check-text { text-decoration: line-through; color: var(--text3); }
-      .check-box { width: 20px; height: 20px; border-radius: 5px; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; transition: all 0.18s; }
-      .checklist-item.done .check-box { background: var(--green); border-color: var(--green); }
-
-      /* ── Empty state ── */
-      .empty-state { text-align: center; padding: 60px 20px; color: var(--text3); }
-      .empty-state-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
-      .empty-state-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--text2); margin-bottom: 8px; }
-
-      /* ── Map popup style ── */
-      .leaflet-popup-content-wrapper { background: var(--surface); color: var(--text); border-radius: 10px; border: 1px solid var(--border); box-shadow: var(--shadow-lg); }
-      .leaflet-popup-tip { background: var(--surface); }
-
-      @media (max-width: 640px) {
-        .main-content { padding: 16px; }
-        .topbar { padding: 10px 16px; }
-        .stat-num { font-size: 24px; }
-      }
-    </style>
+  
     {% block extra_head %}{% endblock %}
     <link rel="stylesheet" href="{% static 'css/socorro.css' %}">
   </head>
-  <body>
+  <body class="{% if user.is_authenticated %}has-sidebar{% endif %}">
 
     {% if user.is_authenticated %}
-    <!-- ─── SIDEBAR ─────────────────────────────────────────── -->
-      <aside class="sidebar" id="sidebar">
-        <div class="ao-flag-stripe"></div>
-        <div class="sidebar-logo-bar">
-          <a href="{% url 'home' %}" style="display:flex;align-items:center;gap:11px;text-decoration:none;">
-            <div style="width:38px;height:38px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🆘</div>
-            <div>
-              <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:#fff;letter-spacing:0.5px;">Socorro<span style="color:var(--accent2);">AO</span></div>
-              <div style="font-size:10px;color:rgba(240,237,232,0.35);letter-spacing:1.2px;text-transform:uppercase;font-family:'Syne',sans-serif;">Gestão de Desastres</div>
-            </div>
-          </a>
-        </div>
-
-        <nav class="sidebar-nav">
-          <div class="nav-section-label">Principal</div>
-          <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-            Dashboard
-            {% if total_incidentes_criticos > 0 %}
-            <span style="margin-left:auto;background:var(--accent);color:white;font-size:10px;font-weight:700;padding:1px 7px;border-radius:100px;font-family:'Syne',sans-serif;">{{ total_incidentes_criticos }}</span>
-            {% endif %}
-          </a>
-          <a href="{% url 'mapa' %}" class="nav-link {% if request.resolver_match.url_name == 'mapa' %}active{% endif %}">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-            Mapa Global
-          </a>
-
-          <div class="nav-section-label" style="margin-top:8px;">Operações</div>
-          <a href="{% url 'incidentes_lista' %}" class="nav-link {% if 'incidente' in request.resolver_match.url_name %}active{% endif %}">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            Incidentes
-            {% if total_incidentes_ativos > 0 %}
-            <span style="margin-left:auto;background:rgba(200,64,26,0.2);color:var(--accent2);font-size:10px;font-weight:700;padding:1px 7px;border-radius:100px;font-family:'Syne',sans-serif;">{{ total_incidentes_ativos }}</span>
-            {% endif %}
-          </a>
-          <a href="{% url 'voluntarios_lista' %}" class="nav-link {% if 'voluntario' in request.resolver_match.url_name %}active{% endif %}">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-            Voluntários
-            {% if total_voluntarios > 0 %}
-            <span style="margin-left:auto;background:rgba(46,125,82,0.15);color:var(--green);font-size:10px;font-weight:700;padding:1px 7px;border-radius:100px;font-family:'Syne',sans-serif;">{{ total_voluntarios }}</span>
-            {% endif %}
-          </a>
-          <a href="{% url 'doacoes_lista' %}" class="nav-link {% if 'doaco' in request.resolver_match.url_name %}active{% endif %}">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-            Centrais de Doação
-          </a>
-
-          <a href="{% url 'relatorios' %}" class="nav-link {% if request.resolver_match.url_name == 'relatorios' %}active{% endif %}">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-            Relatórios
-          </a>
-          <a href="{% url 'analytics' %}" class="nav-link {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-            Analytics
-          </a>
-
-          <div class="nav-section-label" style="margin-top:8px;">Acções Rápidas</div>
-          <a href="{% url 'incidentes_novo' %}" class="nav-link">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-            Reportar Incidente
-          </a>
-          <a href="{% url 'voluntarios_cadastrar' %}" class="nav-link">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-            Novo Voluntário
-          </a>
-        </nav>
-
-        <div class="sidebar-footer">
-          <!-- Language switcher -->
-          <div style="margin-bottom:12px;">
-            <div style="font-size:9.5px;font-weight:700;letter-spacing:1.2px;color:rgba(240,237,232,0.3);text-transform:uppercase;margin-bottom:7px;font-family:'Syne',sans-serif;">Idioma</div>
-            <div style="display:flex;gap:5px;align-items:center;">
-              {% get_current_language as LANG %}
-              {% for lang_code, lang_name in LANGUAGES %}
-              <form method="post" action="{% url 'set_language' %}" style="display:inline;">
-                {% csrf_token %}
-                <input type="hidden" name="language" value="{{ lang_code }}">
-                <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                <button type="submit" class="lang-btn {% if LANG == lang_code %}active{% endif %}">{{ lang_code|upper }}</button>
-              </form>
-              {% endfor %}
-              <button onclick="toggleTheme()" style="margin-left:auto;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:5px 8px;cursor:pointer;font-size:15px;transition:all 0.2s;color:rgba(240,237,232,0.7);" title="Alternar tema">🌓</button>
-            </div>
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SIDEBAR
+         ═══════════════════════════════════════════════════════════════════ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="ao-flag-stripe"></div>
+      <div class="sidebar-logo-bar">
+        <a href="{% url 'home' %}" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+          <div style="width:36px;height:36px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">🆘</div>
+          <div>
+            <div style="font-family:'Inter',system-ui,sans-serif;font-weight:800;font-size:15px;color:#fff;letter-spacing:0.3px;">Socorro<span style="color:var(--accent2);">AO</span></div>
+            <div style="font-size:9.5px;color:rgba(240,237,232,0.35);letter-spacing:1px;text-transform:uppercase;font-family:'Inter',system-ui,sans-serif;">Gestão de Desastres</div>
           </div>
-
-          <!-- User -->
-          <div style="display:flex;align-items:center;gap:10px;">
-            <a href="{% url 'perfil' %}" class="avatar avatar-sm" style="background:var(--accent);color:white;text-decoration:none;">{{ user.username|first|upper }}</a>
-            <div style="flex:1;min-width:0; clickable" onclick="location.href='{% url 'perfil' %}'">
-              <div style="font-size:13px;font-weight:600;color:rgba(240,237,232,0.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ user.get_full_name|default:user.username }}</div>
-              <div style="font-size:10.5px;color:rgba(240,237,232,0.35);">Coordenador</div>
-            </div>
-            <a href="{% url 'logout' %}" style="color:rgba(240,237,232,0.35);text-decoration:none;padding:5px;border-radius:6px;transition:color 0.2s;" title="Sair">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            </a>
-          </div>
-        </div>
-      </aside>
-
-      <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
-
-      <!-- Mobile menu button -->
-      <button id="menuBtn" onclick="openSidebar()" aria-label="Menu">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(240,237,232,0.9)" stroke-width="2">
-          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-        </svg>
-      </button>
-
-      <!-- ─── MAIN WRAP ─────────────────────────────────────────── -->
-      <div class="main-wrap">
-        <!-- Topbar -->
-        <header class="topbar">
-          <div style="display:flex;align-items:center;gap:12px;">
-            <span style="font-size:18px;">🇦🇴</span>
-            <div>
-              <h1 style="font-size:15px;font-weight:700;color:var(--text);">{% block page_title %}Dashboard{% endblock %}</h1>
-              <p style="font-size:11.5px;color:var(--text3);margin-top:1px;">{% block page_subtitle %}{% endblock %}</p>
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;">
-            {% block topbar_actions %}
-            <a href="{% url 'incidentes_novo' %}" class="btn btn-primary btn-sm">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Novo Incidente
-            </a>
-            {% endblock %}
-          </div>
-        </header>
-
-        <!-- Main content -->
-        <main class="main-content page-enter">
-          {% if messages %}
-          <div style="margin-bottom:20px;display:flex;flex-direction:column;gap:8px;">
-            {% for message in messages %}
-            <div class="toast {{ message.tags }}" style="position:relative;max-width:100%;">
-              <span style="font-size:16px;">{% if message.tags == 'success' %}✅{% elif message.tags == 'error' %}❌{% elif message.tags == 'warning' %}⚠️{% else %}ℹ️{% endif %}</span>
-              <span style="flex:1;">{{ message }}</span>
-              <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:0 4px;flex-shrink:0;">×</button>
-            </div>
-            {% endfor %}
-          </div>
-          {% endif %}
-          {% block content %}{% endblock %}
-        </main>
+        </a>
       </div>
 
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Principal</div>
+        <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+          {% if total_incidentes_criticos > 0 %}
+          <span style="margin-left:auto;background:var(--accent);color:white;font-size:10px;font-weight:700;padding:1px 7px;border-radius:100px;font-family:'Inter',system-ui,sans-serif;">{{ total_incidentes_criticos }}</span>
+          {% endif %}
+        </a>
+        <a href="{% url 'mapa' %}" class="nav-link {% if request.resolver_match.url_name == 'mapa' %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+          Mapa Global
+        </a>
+
+        <div class="nav-section-label" style="margin-top:6px;">Operações</div>
+        <a href="{% url 'incidentes_lista' %}" class="nav-link {% if 'incidente' in request.resolver_match.url_name %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Incidentes
+          {% if total_incidentes_ativos > 0 %}
+          <span style="margin-left:auto;background:rgba(200,64,26,0.2);color:var(--accent2);font-size:10px;font-weight:700;padding:1px 7px;border-radius:100px;font-family:'Inter',system-ui,sans-serif;">{{ total_incidentes_ativos }}</span>
+          {% endif %}
+        </a>
+        <a href="{% url 'voluntarios_lista' %}" class="nav-link {% if 'voluntario' in request.resolver_match.url_name %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          Voluntários
+          {% if total_voluntarios > 0 %}
+          <span style="margin-left:auto;background:rgba(46,125,82,0.15);color:var(--green);font-size:10px;font-weight:700;padding:1px 7px;border-radius:100px;font-family:'Inter',system-ui,sans-serif;">{{ total_voluntarios }}</span>
+          {% endif %}
+        </a>
+        <a href="{% url 'doacoes_lista' %}" class="nav-link {% if 'doaco' in request.resolver_match.url_name %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          Centrais de Doação
+        </a>
+
+        <a href="{% url 'relatorios' %}" class="nav-link {% if request.resolver_match.url_name == 'relatorios' %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Relatórios
+        </a>
+        <a href="{% url 'analytics' %}" class="nav-link {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Analytics
+        </a>
+
+        <div class="nav-section-label" style="margin-top:6px;">Acções Rápidas</div>
+        <a href="{% url 'incidentes_novo' %}" class="nav-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          Reportar Incidente
+        </a>
+        <a href="{% url 'voluntarios_cadastrar' %}" class="nav-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+          Novo Voluntário
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div style="margin-bottom:10px;">
+          <div style="font-size:9px;font-weight:700;letter-spacing:1.2px;color:rgba(240,237,232,0.3);text-transform:uppercase;margin-bottom:6px;font-family:'Inter',system-ui,sans-serif;">Idioma</div>
+          <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;">
+            {% get_current_language as LANG %}
+            {% for lang_code, lang_name in LANGUAGES %}
+            <form method="post" action="{% url 'set_language' %}" style="display:inline;">
+              {% csrf_token %}
+              <input type="hidden" name="language" value="{{ lang_code }}">
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <button type="submit" class="lang-btn {% if LANG == lang_code %}active{% endif %}">{{ lang_code|upper }}</button>
+            </form>
+            {% endfor %}
+            <button id="sidebarThemeBtn" style="margin-left:auto;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:5px 8px;cursor:pointer;font-size:15px;transition:all 0.2s;color:rgba(240,237,232,0.7);min-width:36px;min-height:36px;" title="Alternar tema claro/escuro" aria-label="Alternar tema">🌓</button>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:10px;">
+          <a href="{% url 'perfil' %}" class="avatar avatar-sm" style="background:var(--accent);color:white;text-decoration:none;" aria-label="Ver perfil">{{ user.username|first|upper }}</a>
+          <div style="flex:1;min-width:0;cursor:pointer;" onclick="location.href='{% url 'perfil' %}'">
+            <div style="font-size:12.5px;font-weight:600;color:rgba(240,237,232,0.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ user.get_full_name|default:user.username }}</div>
+            <div style="font-size:10px;color:rgba(240,237,232,0.35);">Coordenador</div>
+          </div>
+          <a href="{% url 'logout' %}" style="color:rgba(240,237,232,0.35);text-decoration:none;padding:5px;border-radius:6px;transition:color 0.2s;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;" title="Sair" aria-label="Terminar sessão">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <button id="menuBtn" onclick="openSidebar()" aria-label="Abrir menu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(240,237,232,0.9)" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         MAIN WRAP (authenticated)
+         ═══════════════════════════════════════════════════════════════════ -->
+    <div class="main-wrap">
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:18px;" aria-hidden="true">🇦🇴</span>
+          <div>
+            <h1 style="font-size:14px;font-weight:700;color:var(--text);">{% block page_title %}Dashboard{% endblock %}</h1>
+            <p style="font-size:11px;color:var(--text3);margin-top:1px;">{% block page_subtitle %}{% endblock %}</p>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          {% block topbar_actions %}
+          <a href="{% url 'incidentes_novo' %}" class="btn btn-primary btn-sm">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Novo Incidente
+          </a>
+          {% endblock %}
+        </div>
+      </header>
+
+      <main class="main-content page-enter">
+        {% if messages %}
+        <div style="margin-bottom:18px;display:flex;flex-direction:column;gap:8px;">
+          {% for message in messages %}
+          <div class="toast {{ message.tags }}" style="position:relative;max-width:100%;">
+            <span style="font-size:16px;" aria-hidden="true">{% if message.tags == 'success' %}✅{% elif message.tags == 'error' %}❌{% elif message.tags == 'warning' %}⚠️{% else %}ℹ️{% endif %}</span>
+            <span style="flex:1;">{{ message }}</span>
+            <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:0 4px;flex-shrink:0;min-width:28px;min-height:28px;" aria-label="Fechar mensagem">×</button>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+
     {% else %}
-  <!-- Public layout without sidebar -->
+    <!-- ═══════════════════════════════════════════════════════════════════
+         PUBLIC LAYOUT (no sidebar)
+         ═══════════════════════════════════════════════════════════════════ -->
     {% block public_content %}{% endblock %}
     {% endif %}
 
+    <!-- ═══════════════════════════════════════════════════════════════════
+         FLOATING THEME TOGGLE (public pages only)
+         ═══════════════════════════════════════════════════════════════════ -->
+    <button id="floatingThemeBtn" class="floating-theme-btn" title="Alternar tema claro/escuro" aria-label="Alternar tema">
+      <span class="theme-icon-light">☀️</span>
+      <span class="theme-icon-dark">🌙</span>
+    </button>
+
     <script>
-      // ── Theme ──
+      // ── Função de toggle de tema (GLOBAL) ────────────────────────────
       function toggleTheme() {
         const html = document.documentElement;
         const isDark = html.classList.contains('dark');
-        html.classList.toggle('dark', !isDark);
-        localStorage.setItem('theme', isDark ? 'light' : 'dark');
+        
+        if (isDark) {
+          html.classList.remove('dark');
+          html.setAttribute('data-theme', 'light');
+          localStorage.setItem('theme', 'light');
+        } else {
+          html.classList.add('dark');
+          html.setAttribute('data-theme', 'dark');
+          localStorage.setItem('theme', 'dark');
+        }
+        
+        console.log('Tema alterado para:', isDark ? 'light' : 'dark');
       }
+      
+      // ── Inicialização do tema ────────────────────────────────────────
       (function() {
-        const t = localStorage.getItem('theme') || 'light';
-        if (t === 'dark') document.documentElement.classList.add('dark');
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+        
+        console.log('Tema inicial:', theme);
+        
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
       })();
 
-      // ── Sidebar mobile ──
+      // ── Event listeners para os botões de tema ───────────────────────
+      document.addEventListener('DOMContentLoaded', function() {
+        // Botão flutuante (páginas públicas)
+        const floatingBtn = document.getElementById('floatingThemeBtn');
+        if (floatingBtn) {
+          floatingBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleTheme();
+          });
+          console.log('Botão flutuante de tema configurado');
+        }
+        
+        // Botão na sidebar (dashboard)
+        const sidebarBtn = document.getElementById('sidebarThemeBtn');
+        if (sidebarBtn) {
+          sidebarBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleTheme();
+          });
+          console.log('Botão da sidebar de tema configurado');
+        }
+      });
+
+      // ── Sidebar mobile ───────────────────────────────────────────────
       function openSidebar() {
-        document.getElementById('sidebar').classList.add('open');
-        document.getElementById('overlay').classList.add('open');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        if (sidebar) sidebar.classList.add('open');
+        if (overlay) overlay.classList.add('open');
         document.body.style.overflow = 'hidden';
       }
+      
       function closeSidebar() {
-        document.getElementById('sidebar').classList.remove('open');
-        document.getElementById('overlay').classList.remove('open');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        if (sidebar) sidebar.classList.remove('open');
+        if (overlay) overlay.classList.remove('open');
         document.body.style.overflow = '';
       }
 
-      // ── CSRF for AJAX ──
-      function getCsrf() {
-        return document.cookie.split(';').find(c=>c.trim().startsWith('csrftoken='))?.split('=')[1] || '';
+      // ── Close on escape ──────────────────────────────────────────────
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeSidebar();
+      });
+
+      // ── Close on overlay click ──────────────────────────────────────
+      const overlay = document.getElementById('overlay');
+      if (overlay) {
+        overlay.addEventListener('click', closeSidebar);
       }
 
-      // ── Auto dismiss toasts ──
+      // ── CSRF helper ──────────────────────────────────────────────────
+      function getCsrf() {
+        return document.cookie.split(';').find(c => c.trim().startsWith('csrftoken='))?.split('=')[1] || '';
+      }
+
+      // ── Auto dismiss toasts ──────────────────────────────────────────
       document.addEventListener('DOMContentLoaded', () => {
         const toasts = document.querySelectorAll('.toast');
         toasts.forEach((t, i) => {
-          setTimeout(() => { t.style.animation = 'slideOutToast 0.3s ease forwards'; setTimeout(() => t.remove(), 300); }, 5000 + i * 500);
+          setTimeout(() => { 
+            t.style.animation = 'slideOutToast 0.3s ease forwards'; 
+            setTimeout(() => t.remove(), 300); 
+          }, 5000 + i * 500);
         });
       });
     </script>
+    
     <style>
-      @keyframes slideOutToast { to { transform: translateX(110%); opacity: 0; } }
+      @keyframes slideOutToast { 
+        to { transform: translateX(110%); opacity: 0; } 
+      }
     </style>
+    
     {% block extra_js %}{% endblock %}
     <script src="{% static 'js/socorro.js' %}"></script>
   </body>
