@@ -1,10 +1,8 @@
 {% extends 'base.html' %}
 {% load i18n humanize static %}
 
-
 {% block extra_head %}
-  <link rel="stylesheet" href="{% static 'css/home.css' %}">
-
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
 {% endblock %}
 
 {% block public_content %}
@@ -18,16 +16,14 @@
     <span class="h-logo-text">Socorro<span>AO</span></span>
   </a>
   
-  <!-- Desktop nav links -->
   <div class="h-nav-links">
-    <a href="{% url 'reportar_publico' %}" class="h-nav-link" style="color:rgba(232,92,53,0.8);">🚨 Reportar Emergência</a>
-    <a href="{% url 'registar_voluntario' %}" class="h-nav-link" style="color:rgba(61,170,111,0.8);">💚 Ser Voluntário</a>
+    <a href="{% url 'reportar_publico' %}" class="h-nav-link" style="color:var(--h-red2);">🚨 Reportar Emergência</a>
+    <a href="{% url 'registar_voluntario' %}" class="h-nav-link" style="color:var(--h-green);">💚 Ser Voluntário</a>
     <div class="h-nav-sep"></div>
     <a href="#funcionalidades" class="h-nav-link">Funcionalidades</a>
     <a href="#como-funciona" class="h-nav-link">Como Funciona</a>
   </div>
   
-  <!-- Desktop right side -->
   <div style="display:flex;align-items:center;gap:8px;" class="h-nav-desktop-right">
     <span style="font-size:20px;" title="Angola" class="h-nav-flag-desktop">🇦🇴</span>
     <a href="{% url 'login' %}" class="h-btn-enter">
@@ -36,13 +32,11 @@
     </a>
   </div>
   
-  <!-- Mobile menu button -->
   <button class="h-mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
     <span id="menuIcon">☰</span>
   </button>
 </nav>
 
-<!-- Mobile menu -->
 <div class="h-mobile-menu" id="mobileMenu">
   <a href="{% url 'reportar_publico' %}" class="h-mobile-link emergency">
     🚨 Reportar Emergência
@@ -68,7 +62,6 @@
   <div class="h-hero-bg"></div>
   <div class="h-hero-grid"></div>
   <div class="h-hero-content">
-    <!-- LEFT -->
     <div>
       <div class="h-pill">
         <div class="h-pill-dot"></div>
@@ -81,7 +74,6 @@
       </h1>
       <p class="h-sub">A plataforma nacional que transforma a resposta a emergências em Angola — conectando voluntários, coordenando recursos e salvando vidas em tempo real.</p>
 
-      <!-- PUBLIC ACTION CARDS -->
       <div class="h-public-banner">
         <a href="{% url 'reportar_publico' %}" class="h-pub-card emergency">
           <div class="h-pub-icon emergency">🚨</div>
@@ -118,7 +110,7 @@
           <div class="h-stat-label">Activos</div>
         </div>
         <div class="h-stat">
-          <div class="h-stat-num" style="color:#fff;">{{ stats.voluntarios }}</div>
+          <div class="h-stat-num" style="color:var(--h-text);">{{ stats.voluntarios }}</div>
           <div class="h-stat-label">Voluntários</div>
         </div>
         <div class="h-stat">
@@ -132,7 +124,6 @@
       </div>
     </div>
 
-    <!-- RIGHT: Live panel -->
     <div class="h-float">
       <div class="h-live-panel">
         <div class="h-live-header">
@@ -140,20 +131,20 @@
             <div class="h-live-indicator"></div>
             Em Tempo Real
           </div>
-          <span style="font-size:11.5px;color:rgba(240,237,232,0.3);">{{ incidentes_recentes|length }} incidentes</span>
+          <span style="font-size:11.5px;color:var(--h-text3);">{{ incidentes_recentes|length }} incidentes</span>
         </div>
         <div class="h-inc-list">
           {% for inc in incidentes_recentes %}
           <div class="h-inc-item">
             <div class="h-inc-emoji">{{ inc.get_tipo_emoji }}</div>
             <div class="h-inc-body">
-              <div class="h-inc-title">{{ inc.titulo }}</div>
+              <div class="h-inc-title" title="{{ inc.titulo }}">{{ inc.titulo }}</div>
               <div class="h-inc-meta">📍 {{ inc.municipio }}, {{ inc.provincia }} · 👥 {{ inc.pessoas_afetadas|intcomma }}</div>
             </div>
             <div class="h-sev h-sev-{{ inc.severidade }}">{{ inc.get_severidade_display }}</div>
           </div>
           {% empty %}
-          <div style="padding:36px 20px;text-align:center;color:rgba(240,237,232,0.25);font-size:13px;">
+          <div style="padding:36px 20px;text-align:center;color:var(--h-text3);font-size:13px;">
             <div style="font-size:28px;margin-bottom:8px;opacity:0.4;">✅</div>
             Nenhum incidente activo de momento.
           </div>
@@ -177,7 +168,6 @@
 <!-- ── PUBLIC ACTION CARDS (big) ── -->
 <section class="h-public-section" style="padding-top:60px;padding-bottom:60px;">
   <div class="h-public-inner">
-
     <div class="h-pub-big-card emergency-card reveal">
       <div class="h-pub-big-badge">Público · Gratuito · Sem conta</div>
       <div class="h-pub-big-icon e">🚨</div>
@@ -225,12 +215,12 @@
     </div>
     <div class="h-impact-grid reveal">
       <div class="h-impact-item">
-        <div class="h-impact-num" style="color:var(--h-red);">{{ stats.incidentes_ativos }}<span style="font-size:0.5em;color:rgba(240,237,232,0.25);">+</span></div>
+        <div class="h-impact-num" style="color:var(--h-red);">{{ stats.incidentes_ativos }}<span style="font-size:0.5em;color:var(--h-text3);">+</span></div>
         <div class="h-impact-label">Incidentes Geridos</div>
         <div class="h-impact-sub">Em todas as 18 províncias</div>
       </div>
       <div class="h-impact-item">
-        <div class="h-impact-num" style="color:#fff;">{{ stats.voluntarios }}<span style="font-size:0.5em;color:rgba(240,237,232,0.25);">+</span></div>
+        <div class="h-impact-num" style="color:var(--h-text);">{{ stats.voluntarios }}<span style="font-size:0.5em;color:var(--h-text3);">+</span></div>
         <div class="h-impact-label">Voluntários Activos</div>
         <div class="h-impact-sub">Disponíveis agora</div>
       </div>
@@ -326,7 +316,6 @@
 <!-- ── CTA ── -->
 <section class="h-cta">
   <div class="h-cta-bg"></div>
-  <div class="h-cta-grid"></div>
   <div class="h-cta-inner reveal">
     <div class="h-cta-icon">🆘</div>
     <h2 class="h-cta-title">Pronto para fazer<br>a diferença?</h2>
@@ -336,7 +325,7 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         Reportar Emergência
       </a>
-      <a href="{% url 'registar_voluntario' %}" class="h-cta-btn" style="background:var(--h-green);box-shadow:0 4px 18px rgba(46,125,82,0.4);">
+      <a href="{% url 'registar_voluntario' %}" class="h-cta-btn" style="background:var(--h-green);box-shadow:0 4px 18px rgba(46,125,82,0.3);">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
         Ser Voluntário
       </a>
@@ -361,8 +350,8 @@
 <footer class="h-footer">
   <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
     <div class="h-footer-logo">Socorro<span>AO</span></div>
-    <div style="width:1px;height:16px;background:rgba(255,255,255,0.08);"></div>
-    <div style="font-size:12.5px;color:rgba(240,237,232,0.22);">© 2025 — Sistema Nacional de Coordenação de Desastres</div>
+    <div style="width:1px;height:16px;background:var(--h-border);"></div>
+    <div style="font-size:12.5px;color:var(--h-text3);">© 2025 — Sistema Nacional de Coordenação de Desastres</div>
   </div>
   <div class="h-footer-links">
     <a href="{% url 'reportar_publico' %}" class="h-footer-link urgent">🚨 Reportar Emergência</a>
@@ -370,14 +359,13 @@
     <a href="{% url 'login' %}" class="h-footer-link">Coordenadores</a>
     <div style="display:flex;align-items:center;gap:6px;padding:4px 10px;">
       <span style="font-size:18px;">🇦🇴</span>
-      <span style="font-size:12px;color:rgba(240,237,232,0.2);">Angola</span>
+      <span style="font-size:12px;color:var(--h-text3);">Angola</span>
     </div>
   </div>
 </footer>
 </div>
 
 <script>
-// ── Mobile menu toggle ───────────────────────────────────────────────────
 const menuBtn = document.getElementById('mobileMenuBtn');
 const mobileMenu = document.getElementById('mobileMenu');
 const menuIcon = document.getElementById('menuIcon');
@@ -385,31 +373,28 @@ const menuIcon = document.getElementById('menuIcon');
 menuBtn.addEventListener('click', () => {
   mobileMenu.classList.toggle('active');
   menuIcon.textContent = mobileMenu.classList.contains('active') ? '✕' : '☰';
+  document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
 });
 
-// Close menu when clicking a link
 mobileMenu.querySelectorAll('a').forEach(link => {
   link.addEventListener('click', () => {
     mobileMenu.classList.remove('active');
     menuIcon.textContent = '☰';
+    document.body.style.overflow = '';
   });
 });
 
-// ── Navbar scroll ──────────────────────────────────────────────────────
 const nav = document.getElementById('hNav');
 window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 44), { passive: true });
 
-// ── Scroll reveal ──────────────────────────────────────────────────────
 const ro = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
 document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
 
-// ── Smooth scroll anchors ──────────────────────────────────────────────
 document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', e => {
   const t = document.querySelector(a.getAttribute('href'));
   if(t){ e.preventDefault(); t.scrollIntoView({ behavior:'smooth', block:'start' }); }
 }));
 
-// ── Animated counters ──────────────────────────────────────────────────
 function animateVal(el, target, dur=1400) {
   const s = performance.now();
   const ease = t => 1 - Math.pow(1-t, 3);
