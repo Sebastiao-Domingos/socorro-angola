@@ -1,45 +1,169 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt" class="light" data-theme="light">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#2E7D52">
-<title>✅ Reporte Enviado — SocorroAO</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:#F7F3EE;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;}
-.card{background:#fff;border-radius:20px;padding:40px 32px;max-width:420px;width:100%;box-shadow:0 8px 40px rgba(26,23,20,0.1);}
-.check-circle{width:88px;height:88px;background:linear-gradient(135deg,#2E7D52,#3DAA6F);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:40px;box-shadow:0 8px 24px rgba(46,125,82,0.35);animation:popIn 0.5s cubic-bezier(0.34,1.56,0.64,1);}
-@keyframes popIn{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
-h1{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#1A1714;margin-bottom:10px;}
-p{font-size:14.5px;color:#5C544A;line-height:1.65;margin-bottom:24px;}
-.steps{text-align:left;background:#F7F3EE;border-radius:12px;padding:18px;margin-bottom:28px;}
-.step-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;}
-.step-row:last-child{margin-bottom:0;}
-.step-num{width:24px;height:24px;border-radius:50%;background:#C8401A;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Syne',sans-serif;margin-top:1px;}
-.step-text{font-size:13.5px;color:#1A1714;line-height:1.5;}
-.btn-primary{display:block;width:100%;background:#C8401A;color:#fff;border:none;border-radius:10px;padding:14px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;text-decoration:none;margin-bottom:10px;transition:all 0.2s;}
-.btn-primary:hover{background:#E85C35;}
-.btn-secondary{display:block;width:100%;background:transparent;color:#5C544A;border:1.5px solid #E2DDD5;border-radius:10px;padding:13px;font-family:'Syne',sans-serif;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;transition:all 0.2s;}
-.btn-secondary:hover{background:#F0EDE8;}
-.footer-text{margin-top:20px;font-size:12.5px;color:#9A8F82;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="theme-color" content="#2E7D52">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="description" content="Reporte enviado com sucesso — SocorroAO">
+    <title>✅ Reporte Enviado — SocorroAO</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{% static 'css/incidente/reportar_sucesso.css' %}">
+  
 </head>
 <body>
-<div class="card">
-  <div class="check-circle">✅</div>
-  <h1>Reporte Enviado!</h1>
-  <p>O seu reporte foi recebido com sucesso e está a ser processado pelos coordenadores do SocorroAO.</p>
-  <div class="steps">
-    <div class="step-row"><div class="step-num">1</div><div class="step-text"><strong>Coordenadores notificados</strong> — A equipa recebeu o alerta de imediato.</div></div>
-    <div class="step-row"><div class="step-num">2</div><div class="step-text"><strong>Voluntários a ser mobilizados</strong> — Os mais próximos estão a ser contactados.</div></div>
-    <div class="step-row"><div class="step-num">3</div><div class="step-text"><strong>Resposta em curso</strong> — A situação será monitorizada até resolução.</div></div>
-  </div>
-  <a href="{% url 'reportar_publico' %}" class="btn-primary">Reportar outro Incidente</a>
-  <a href="{% url 'home' %}" class="btn-secondary">Voltar à Página Inicial</a>
-  <div class="footer-text">🇦🇴 SocorroAO · Obrigado por ajudar Angola</div>
-</div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         CONFETTI ANIMATION
+         ═══════════════════════════════════════════════════════════════════ -->
+    <div class="confetti-container" id="confettiContainer"></div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         CARD
+         ═══════════════════════════════════════════════════════════════════ -->
+    <div class="card">
+        <!-- Check circle with pulse rings -->
+        <div class="check-circle-wrapper">
+            <div class="check-pulse"></div>
+            <div class="check-pulse"></div>
+            <div class="check-pulse"></div>
+            <div class="check-circle" aria-hidden="true">✅</div>
+        </div>
+
+        <h1>Reporte Enviado!</h1>
+        <p class="subtitle">O seu reporte foi recebido com sucesso e está a ser processado pelos coordenadores do SocorroAO.</p>
+
+        <!-- Next steps -->
+        <div class="steps">
+            <div class="steps-title">O que acontece agora</div>
+            <div class="step-row">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                    <div class="step-text"><strong>Coordenadores notificados</strong> — A equipa recebeu o alerta de imediato.</div>
+                    <div class="step-time">⏱️ Agora mesmo</div>
+                </div>
+            </div>
+            <div class="step-row">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                    <div class="step-text"><strong>Voluntários a ser mobilizados</strong> — Os mais próximos estão a ser contactados.</div>
+                    <div class="step-time">⏱️ Próximos minutos</div>
+                </div>
+            </div>
+            <div class="step-row">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                    <div class="step-text"><strong>Resposta em curso</strong> — A situação será monitorizada até resolução.</div>
+                    <div class="step-time">⏱️ Em andamento</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <a href="{% url 'reportar_publico' %}" class="btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Reportar outro Incidente
+        </a>
+        <a href="{% url 'home' %}" class="btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            Voltar à Página Inicial
+        </a>
+
+        <div class="footer-text">
+            🇦🇴 SocorroAO · Obrigado por ajudar Angola <span class="heart">❤️</span>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         FLOATING THEME TOGGLE
+         ═══════════════════════════════════════════════════════════════════ -->
+    <button id="floatingThemeBtn" class="floating-theme-btn" title="Alternar tema claro/escuro" aria-label="Alternar tema">
+        <span class="theme-icon-light">☀️</span>
+        <span class="theme-icon-dark">🌙</span>
+    </button>
+
+    <script>
+        // ── Theme management ──────────────────────────────────────────
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.classList.contains('dark');
+            
+            if (isDark) {
+                html.classList.remove('dark');
+                html.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+            
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const floatingBtn = document.getElementById('floatingThemeBtn');
+            if (floatingBtn) {
+                floatingBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleTheme();
+                });
+            }
+
+            // ── Launch confetti ──────────────────────────────────────
+            createConfetti();
+        });
+
+        // ── Confetti animation ───────────────────────────────────────
+        function createConfetti() {
+            const container = document.getElementById('confettiContainer');
+            const colors = [
+                '#C8401A', '#E85C35', '#D4A843', '#E4BB5C',
+                '#2E7D52', '#3DAA6F', '#1A5C8A', '#4A9AC4'
+            ];
+            
+            const fragment = document.createDocumentFragment();
+            
+            for (let i = 0; i < 60; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = (Math.random() * 10 + 6) + 'px';
+                confetti.style.height = (Math.random() * 10 + 6) + 'px';
+                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                confetti.style.animationDelay = (Math.random() * 1.5) + 's';
+                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                fragment.appendChild(confetti);
+            }
+            
+            container.appendChild(fragment);
+            
+            // Clean up after animation
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+    </script>
 </body>
 </html>
