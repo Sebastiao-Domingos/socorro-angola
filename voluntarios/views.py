@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from django.db.models import Q
 from django.core.paginator import Paginator
 from .models import Voluntario, Habilidade, PROVINCIAS
+from data import disponibilidade_data
 
 @login_required
 def lista(request):
@@ -126,6 +127,8 @@ def atualizar_disponibilidade(request, pk):
 
 
 def registar_publico(request):
+
+    disponibilidades = disponibilidade_data.disponibilidades()
     """Página pública para voluntários se cadastrarem — mobile-first."""
     habilidades = Habilidade.objects.all()
     if request.method == 'POST':
@@ -159,6 +162,7 @@ def registar_publico(request):
     return render(request, 'voluntarios/registar_publico.html', {
         'habilidades': habilidades,
         'provincias': PROVINCIAS,
+        'disponibilidades': disponibilidades
     })
 
 

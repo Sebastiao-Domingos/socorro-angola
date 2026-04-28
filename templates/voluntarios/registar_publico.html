@@ -384,8 +384,8 @@ select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='
       </div>
       <div class="form-card-body">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-          {% for val, label, desc, emoji in "disponivel,Disponível Agora,Posso responder a qualquer momento,✅|ocupado,Ocupado Temporariamente,Estou disponível mas com limitações,⏸️|indisponivel,Indisponível,Não posso participar agora,❌"|split:"|" %}
-          {% with parts=val|split:"," %}{% endwith %}
+          {% for val, label, desc, emoji in disponibilidades %}
+          {% comment %} {% with parts=val.split:"," %}{% endwith %} {% endcomment %}
           {% endfor %}
           <!-- Manual rendering for clarity -->
           <div class="sev-opt" style="grid-column:1/-1;">
