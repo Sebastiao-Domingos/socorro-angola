@@ -16,7 +16,11 @@ SECRET_KEY = config('SECRET_KEY',default='django-insecure-_k)#0xqyb0kj*71b=fljh%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default="localhost,127.0.0.1", cast=Csv())
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS', 
+    default="localhost,127.0.0.1,.vercel.app", 
+    cast=Csv()
+)
 
 
 # Application definition
@@ -92,7 +96,7 @@ if DATABASE_URL.startswith("sqlite"):
     }
 else:
     DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True, conn_health_checks=True)
+        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=False, conn_health_checks=True)
     }
 
 
@@ -194,7 +198,7 @@ MESSAGES_TAGS = {
     messages.ERROR : "error",
 }
 
-SESSION_ENDINE = "django.contrib.sessions.backends.db"
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
 SESSION_COOKIE_AGE = 60 * 60 * 24
 
 
