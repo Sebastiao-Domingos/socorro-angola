@@ -1,18 +1,14 @@
 #!/bin/bash
 
-echo "=== SocorroAO Build Script ==="
+echo "=== SocorroAO - Iniciando Build ==="
 
-# Instala as dependências
+# Instalar dependências
 pip install -r requirements.txt
 
-# Coleta arquivos estáticos
+echo "→ Coletando static files..."
 python manage.py collectstatic --noinput --clear
 
-# Aplica as migrações no banco de produção
+echo "→ Aplicando migrações no banco..."
 python manage.py migrate --noinput
 
-# (Opcional) Seed inicial - remova o --noinput se não for necessário
-echo "=== Executando seed ==="
-python manage.py shell < scripts/seed.py || echo "Seed finalizado ou não encontrou arquivo."
-
-echo "=== Build complete ==="
+echo "→ Build finalizado com sucesso ==="
