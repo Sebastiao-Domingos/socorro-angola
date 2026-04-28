@@ -213,14 +213,18 @@ def reportar_publico(request):
             if request.FILES.get('imagem'):
                 inc.imagem = request.FILES['imagem']
             inc.save()
+
             items = CHECKLIST_PADRAO.get(inc.tipo, [])
             for i, item in enumerate(items):
                 ChecklistItem.objects.create(incidente=inc, descricao=item, ordem=i)
+
             # Return success page or JSON
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 from django.http import JsonResponse
                 return JsonResponse({'ok': True, 'id': inc.pk})
+            
             return redirect('reportar_sucesso')
+        
         except Exception as e:
             from django.contrib import messages
             messages.error(request, f'Erro ao registar: {str(e)}')
