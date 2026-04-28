@@ -1045,15 +1045,172 @@ margin-bottom: 8px;
     LEAFLET OVERRIDES
     ═══════════════════════════════════════════════════════════════════ */
 .leaflet-popup-content-wrapper { 
-background: var(--surface); 
-color: var(--text); 
-border-radius: 10px; 
-border: 1px solid var(--border); 
-box-shadow: var(--shadow-lg); 
+    background: var(--surface); 
+    color: var(--text); 
+    border-radius: 10px; 
+    border: 1px solid var(--border); 
+    box-shadow: var(--shadow-lg); 
 }
 .leaflet-popup-tip { 
-background: var(--surface); 
+    background: var(--surface); 
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   LOADING OVERLAY (global)
+   ═══════════════════════════════════════════════════════════════════ */
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s ease;
+}
+
+.loading-overlay.active {
+    display: flex;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.loading-spinner-wrapper {
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 32px 40px;
+    text-align: center;
+    box-shadow: var(--shadow-xl);
+    animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    min-width: 200px;
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Spinner animado */
+.loading-spinner {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 16px;
+    position: relative;
+}
+
+.loading-spinner-ring {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 4px solid var(--border);
+    border-top-color: var(--accent);
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Spinner com ícone */
+.loading-spinner-icon {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    animation: pulse 1.5s ease infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(0.8); opacity: 0.6; }
+}
+
+.loading-text {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--text);
+    margin-bottom: 4px;
+}
+
+.loading-subtext {
+    font-size: 12.5px;
+    color: var(--text3);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LOADING BUTTON (inline)
+   ═══════════════════════════════════════════════════════════════════ */
+.btn-loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.btn-loading .btn-text {
+    visibility: hidden;
+}
+
+.btn-loading .btn-spinner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: inherit;
+}
+
+.btn-loading .btn-spinner::before {
+    content: '';
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2.5px solid currentColor;
+    border-top-color: transparent;
+    animation: spin 0.7s linear infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   TABLE LOADING (for list pages)
+   ═══════════════════════════════════════════════════════════════════ */
+.table-loading {
+    position: relative;
+    min-height: 200px;
+}
+
+.table-loading::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--surface);
+    opacity: 0.6;
+    z-index: 10;
+    border-radius: var(--radius);
+}
+
+.table-loading-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 11;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    animation: spin 0.8s linear infinite;
+}
+
+
 
 /* ═══════════════════════════════════════════════════════════════════
     RESPONSIVE
