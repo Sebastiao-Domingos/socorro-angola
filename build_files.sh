@@ -1,14 +1,18 @@
 #!/bin/bash
 
-echo "=== SocorroAO - Iniciando Build ==="
+echo "=== SocorroAO - Build Iniciando ==="
 
 # Instalar dependências
 pip install -r requirements.txt
 
-echo "→ Coletando static files..."
+echo "→ Coletando arquivos estáticos..."
 python manage.py collectstatic --noinput --clear
 
-echo "→ Aplicando migrações no banco..."
+echo "→ Aplicando migrações..."
 python manage.py migrate --noinput
 
-echo "→ Build finalizado com sucesso ==="
+echo "→ Build finalizado ==="
+
+# Verificação para ajudar no debug
+echo "→ Conteúdo da pasta staticfiles:"
+ls -la staticfiles/ || echo "Pasta staticfiles não encontrada!"
