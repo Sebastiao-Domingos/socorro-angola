@@ -10,202 +10,7 @@
         <title>🆘 Reportar Emergência — SocorroAO</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-        <style>
-        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-        :root{
-        --red:#C8401A;--red2:#E85C35;--dark:#0D0B09;
-        --gold:#D4A843;--green:#2E7D52;
-        --bg:#F7F3EE;--surface:#FFFFFF;--border:#E2DDD5;
-        --text:#1A1714;--text2:#5C544A;--text3:#9A8F82;
-        --radius:14px;--shadow:0 4px 24px rgba(26,23,20,0.10);
-        }
-        html{scroll-behavior:smooth;}
-        body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
-        h1,h2,h3,h4{font-family:'Syne',sans-serif;}
-
-        /* ── TOP BAR ── */
-        .pub-topbar{
-        background:var(--dark);
-        padding:14px 20px;
-        display:flex;align-items:center;justify-content:space-between;
-        position:sticky;top:0;z-index:100;
-        }
-        .pub-logo{display:flex;align-items:center;gap:9px;text-decoration:none;}
-        .pub-logo-icon{width:34px;height:34px;background:var(--red);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;}
-        .pub-logo-text{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:#fff;}
-        .pub-logo-text span{color:var(--red2);}
-        .pub-topbar-links{display:flex;gap:12px;}
-        .pub-topbar-link{font-size:13px;color:rgba(255,255,255,0.55);text-decoration:none;padding:6px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:7px;transition:all 0.2s;}
-        .pub-topbar-link:hover{color:#fff;border-color:rgba(255,255,255,0.25);}
-
-        /* ── HERO BANNER ── */
-        .rep-hero{
-        background:linear-gradient(135deg, #8B1A08 0%, var(--red) 50%, #E85C35 100%);
-        padding:36px 20px 32px;
-        text-align:center;
-        position:relative;
-        overflow:hidden;
-        }
-        .rep-hero::before{
-        content:'';position:absolute;inset:0;
-        background-image:radial-gradient(rgba(255,255,255,0.06) 1px,transparent 1px);
-        background-size:22px 22px;
-        }
-        .rep-hero-badge{
-        display:inline-flex;align-items:center;gap:7px;
-        background:rgba(255,255,255,0.15);
-        border:1px solid rgba(255,255,255,0.25);
-        border-radius:100px;padding:5px 14px;
-        font-size:11.5px;font-weight:700;color:#fff;
-        letter-spacing:0.8px;text-transform:uppercase;
-        margin-bottom:16px;
-        font-family:'Syne',sans-serif;
-        }
-        .rep-hero-dot{width:7px;height:7px;border-radius:50%;background:#fff;animation:blink 1.2s ease infinite;}
-        @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
-        .rep-hero h1{font-size:clamp(24px,6vw,36px);font-weight:800;color:#fff;line-height:1.1;margin-bottom:10px;position:relative;}
-        .rep-hero p{font-size:15px;color:rgba(255,255,255,0.82);max-width:480px;margin:0 auto;line-height:1.6;position:relative;}
-
-        /* ── URGENCY STEPS ── */
-        .steps-section{padding:28px 20px 0;max-width:600px;margin:0 auto;}
-        .steps-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text3);margin-bottom:16px;font-family:'Syne',sans-serif;}
-        .steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px;}
-        .step-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 12px;text-align:center;}
-        .step-emoji{font-size:26px;margin-bottom:7px;}
-        .step-num{width:20px;height:20px;border-radius:50%;background:var(--red);color:#fff;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;margin-bottom:6px;}
-        .step-label{font-size:12px;color:var(--text2);line-height:1.4;font-weight:500;}
-
-        /* ── WARNING BOX ── */
-        .warn-box{
-        background:#FFF3F0;border:1px solid rgba(200,64,26,0.25);
-        border-left:4px solid var(--red);border-radius:10px;
-        padding:14px 16px;margin:0 20px 20px;max-width:560px;
-        margin-left:auto;margin-right:auto;
-        display:flex;gap:12px;align-items:flex-start;
-        }
-        .warn-box-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
-        .warn-box-text{font-size:13px;color:#7A1A08;line-height:1.55;}
-        .warn-box-text strong{font-weight:700;}
-
-        /* ── FORM ── */
-        .pub-form-wrap{max-width:600px;margin:0 auto;padding:0 16px 48px;}
-        .form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px;overflow:hidden;box-shadow:var(--shadow);}
-        .form-card-head{
-        padding:16px 20px;border-bottom:1px solid var(--border);
-        background:linear-gradient(135deg,#FAFAF8,#F5F2ED);
-        display:flex;align-items:center;gap:10px;
-        }
-        .form-card-icon{font-size:22px;}
-        .form-card-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);}
-        .form-card-subtitle{font-size:12.5px;color:var(--text3);margin-top:2px;}
-        .form-card-body{padding:18px 20px;}
-
-        /* ── Inputs ── */
-        label.fl{display:block;font-size:12.5px;font-weight:700;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;}
-        label.fl span.req{color:var(--red);}
-        .fi{
-        width:100%;background:var(--bg);color:var(--text);
-        border:1.5px solid var(--border);border-radius:10px;
-        padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:15px;
-        transition:border 0.2s,box-shadow 0.2s;outline:none;
-        -webkit-appearance:none;appearance:none;
-        }
-        .fi:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(200,64,26,0.1);}
-        .fi::placeholder{color:var(--text3);}
-        textarea.fi{resize:vertical;min-height:90px;}
-        select.fi{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239A8F82' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;}
-        .fg{margin-bottom:16px;}
-        .fg:last-child{margin-bottom:0;}
-        .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-
-        /* ── Severity selector ── */
-        .sev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-        .sev-opt{position:relative;}
-        .sev-opt input{position:absolute;opacity:0;width:0;height:0;}
-        .sev-opt label{
-        display:flex;flex-direction:column;align-items:center;gap:5px;
-        padding:12px 8px;border:2px solid var(--border);border-radius:10px;
-        cursor:pointer;transition:all 0.18s;text-align:center;
-        background:var(--bg);
-        }
-        .sev-opt label:hover{border-color:var(--red);}
-        .sev-opt input:checked + label{border-color:var(--red);background:rgba(200,64,26,0.07);}
-        .sev-emoji{font-size:24px;}
-        .sev-text{font-size:12px;font-weight:700;font-family:'Syne',sans-serif;color:var(--text);}
-        .sev-desc{font-size:10.5px;color:var(--text3);}
-
-        /* ── Tipo selector (scrollable chips) ── */
-        .tipo-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
-        .tipo-scroll::-webkit-scrollbar{display:none;}
-        .tipo-chip{position:relative;flex-shrink:0;}
-        .tipo-chip input{position:absolute;opacity:0;width:0;height:0;}
-        .tipo-chip label{
-        display:flex;align-items:center;gap:6px;
-        padding:9px 14px;border:1.5px solid var(--border);border-radius:100px;
-        cursor:pointer;transition:all 0.18s;background:var(--bg);
-        font-size:13.5px;font-weight:500;white-space:nowrap;color:var(--text2);
-        }
-        .tipo-chip label:hover{border-color:var(--red);color:var(--text);}
-        .tipo-chip input:checked + label{border-color:var(--red);background:rgba(200,64,26,0.08);color:var(--red);font-weight:600;}
-        .tipo-chip-emoji{font-size:16px;}
-
-        /* ── Photo upload ── */
-        .photo-zone{
-        border:2px dashed var(--border);border-radius:12px;
-        padding:24px 16px;text-align:center;cursor:pointer;
-        transition:all 0.2s;background:var(--bg);
-        position:relative;
-        }
-        .photo-zone:hover,.photo-zone.dragover{border-color:var(--red);background:rgba(200,64,26,0.04);}
-        .photo-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-        .photo-zone-icon{font-size:36px;margin-bottom:10px;}
-        .photo-zone-text{font-size:14px;font-weight:600;color:var(--text2);margin-bottom:4px;}
-        .photo-zone-sub{font-size:12px;color:var(--text3);}
-        .photo-preview{display:none;margin-top:12px;}
-        .photo-preview img{width:100%;max-height:200px;object-fit:cover;border-radius:8px;}
-
-        /* ── GPS button ── */
-        .gps-row{display:flex;gap:8px;align-items:flex-end;}
-        .gps-btn{
-        flex-shrink:0;background:var(--dark);color:#fff;
-        border:none;border-radius:10px;padding:12px 16px;
-        font-size:18px;cursor:pointer;transition:all 0.2s;
-        display:flex;align-items:center;gap:6px;
-        }
-        .gps-btn:active{transform:scale(0.96);}
-        .gps-btn span{font-size:13px;font-weight:600;font-family:'Syne',sans-serif;}
-        .gps-status{font-size:12px;margin-top:6px;height:16px;}
-        .gps-ok{color:var(--green);}
-        .gps-err{color:var(--red);}
-
-        /* ── Submit btn ── */
-        .submit-wrap{padding:0 0 8px;}
-        .pub-submit{
-        width:100%;background:var(--red);color:#fff;border:none;
-        border-radius:12px;padding:18px;
-        font-family:'Syne',sans-serif;font-size:17px;font-weight:800;
-        cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
-        transition:all 0.2s;letter-spacing:0.3px;
-        box-shadow:0 4px 20px rgba(200,64,26,0.35);
-        }
-        .pub-submit:hover{background:var(--red2);transform:translateY(-2px);box-shadow:0 8px 28px rgba(200,64,26,0.45);}
-        .pub-submit:active{transform:scale(0.98);}
-        .pub-submit:disabled{opacity:0.6;pointer-events:none;}
-
-        /* ── Loading spinner ── */
-        .spinner{width:20px;height:20px;border:3px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:none;}
-        @keyframes spin{to{transform:rotate(360deg);}}
-
-        /* ── Footer links ── */
-        .pub-footer{text-align:center;padding:20px;font-size:13px;color:var(--text3);}
-        .pub-footer a{color:var(--red);text-decoration:none;}
-
-        /* Responsive */
-        @media(max-width:480px){
-        .steps-grid{grid-template-columns:1fr 1fr 1fr;}
-        .grid2{grid-template-columns:1fr;}
-        }
-        </style>
+        <link rel="stylesheet" href="{% static 'css/reportar_publico.css' %}">
     </head>
 <body>
 
@@ -269,68 +74,71 @@
         {% csrf_token %}
 
         <!-- 1. Tipo de Emergência -->
-        <div class="form-card">
+      <div class="form-card">
         <div class="form-card-head">
             <div class="form-card-icon">🚨</div>
             <div>
-            <div class="form-card-title">Tipo de Emergência <span style="color:var(--red);">*</span></div>
-            <div class="form-card-subtitle">Seleccione o que melhor descreve a situação</div>
+              <div class="form-card-title">Tipo de Emergência <span style="color:var(--red);">*</span></div>
+              <div class="form-card-subtitle">Seleccione o que melhor descreve a situação</div>
             </div>
-        </div>
+        </div> 
         <div class="form-card-body">
-            <div class="tipo-scroll" id="tipoScroll">
-            {% for code, label in tipos %}
-            {% comment %} {% with parts=label|split:" " %}
-            <div class="tipo-chip">
-                <input type="radio" name="tipo" id="tipo_{{ code }}" value="{{ code }}" {% if code == 'enchente' %}checked{% endif %}>
-                <label for="tipo_{{ code }}">
-                <span class="tipo-chip-emoji">{{ parts.0 }}</span>
-                {% for p in parts|slice:"1:" %}{{ p }} {% endfor %}
-                </label>
-            </div>
-            {% endwith %} {% endcomment %}
-            {% endfor %}
-            </div>
-        </div>
+              <div class="tipo-scroll" id="tipoScroll">
+                  {% for code, label in tipos %}
+                  <div class="tipo-chip">
+                      <input type="radio" name="tipo" id="tipo_{{ code }}" value="{{ code }}" 
+                            {% if code == 'enchente' %}checked{% endif %}>
+                      <label for="tipo_{{ code }}">
+                          <span class="tipo-chip-emoji">{{ label|slice:":2" }}</span>
+                          {{ label|slice:"2:" }}
+                      </label>
+                  </div>
+                  {% endfor %}
+              </div>
+          </div>
+
+        
+        <!-- Tipo de Emergência -->
+
         </div>
 
         <!-- 2. Severidade -->
         <div class="form-card">
-        <div class="form-card-head">
-            <div class="form-card-icon">⚠️</div>
-            <div>
-            <div class="form-card-title">Nível de Urgência <span style="color:var(--red);">*</span></div>
-            <div class="form-card-subtitle">Quão grave é a situação?</div>
-            </div>
-        </div>
-        <div class="form-card-body">
-            <div class="sev-grid">
-            <div class="sev-opt">
-                <input type="radio" name="severidade" id="sev_baixo" value="baixo">
-                <label for="sev_baixo">
-                <span class="sev-emoji">🟡</span>
-                <span class="sev-text">Baixo</span>
-                <span class="sev-desc">Situação controlável, sem risco imediato</span>
-                </label>
-            </div>
-            <div class="sev-opt">
-                <input type="radio" name="severidade" id="sev_medio" value="medio" checked>
-                <label for="sev_medio">
-                <span class="sev-emoji">🟠</span>
-                <span class="sev-text">Médio</span>
-                <span class="sev-desc">Precisa de ajuda, mas sem perigo de morte</span>
-                </label>
-            </div>
-            <div class="sev-opt">
-                <input type="radio" name="severidade" id="sev_critico" value="critico">
-                <label for="sev_critico">
-                <span class="sev-emoji">🔴</span>
-                <span class="sev-text">Crítico</span>
-                <span class="sev-desc">Perigo de vida, ajuda urgentíssima!</span>
-                </label>
-            </div>
-            </div>
-        </div>
+          <div class="form-card-head">
+              <div class="form-card-icon">⚠️</div>
+              <div>
+              <div class="form-card-title">Nível de Urgência <span style="color:var(--red);">*</span></div>
+              <div class="form-card-subtitle">Quão grave é a situação?</div>
+              </div>
+          </div>
+          <div class="form-card-body">
+              <div class="sev-grid">
+              <div class="sev-opt">
+                  <input type="radio" name="severidade" id="sev_baixo" value="baixo">
+                  <label for="sev_baixo">
+                  <span class="sev-emoji">🟡</span>
+                  <span class="sev-text">Baixo</span>
+                  <span class="sev-desc">Situação controlável, sem risco imediato</span>
+                  </label>
+              </div>
+              <div class="sev-opt">
+                  <input type="radio" name="severidade" id="sev_medio" value="medio" checked>
+                  <label for="sev_medio">
+                  <span class="sev-emoji">🟠</span>
+                  <span class="sev-text">Médio</span>
+                  <span class="sev-desc">Precisa de ajuda, mas sem perigo de morte</span>
+                  </label>
+              </div>
+              <div class="sev-opt">
+                  <input type="radio" name="severidade" id="sev_critico" value="critico">
+                  <label for="sev_critico">
+                  <span class="sev-emoji">🔴</span>
+                  <span class="sev-text">Crítico</span>
+                  <span class="sev-desc">Perigo de vida, ajuda urgentíssima!</span>
+                  </label>
+              </div>
+              </div>
+          </div>
         </div>
 
         <!-- 3. O que aconteceu -->
