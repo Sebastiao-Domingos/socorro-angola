@@ -10,11 +10,6 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-#SECRET_KEY = 'django-insecure-_k)#0xqyb0kj*71b=fljh%zl*tw^4q^w(8l!36!01@0gg*+a_c'
 
 SECRET_KEY = config('SECRET_KEY',default='django-insecure-_k)#0xqyb0kj*71b=fljh%zl*tw^4q^w(8l!36!01@0gg*+a_c')
 
@@ -32,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     "django.contrib.humanize",
     "corsheaders",
@@ -96,7 +92,7 @@ if DATABASE_URL.startswith("sqlite"):
     }
 else:
     DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True)
+        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True, conn_health_checks=True)
     }
 
 
@@ -174,7 +170,7 @@ LOGOUT_REDIRECT_URL = "/"
 print("---------------------------------------------------------------------------------------")
 
 if not DEBUG :
-    print("oallllllllllll sebastiao")
+    print("🚨 Modo de produção ativado")
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
